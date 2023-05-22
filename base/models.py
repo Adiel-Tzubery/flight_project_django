@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 # Create your models here.
 class Country(models.Model):
     name = models.CharField(max_length=30, unique=True)
-    flag = models.ImageField(null=True, blank=True, default='defaults/NAME.png', upload_to='countries/')
+    flag = models.ImageField(null=True, blank=True, default='defaults/default_flag_piq.png', upload_to='countries/')
 
 
 class Flight(models.Model):
@@ -54,7 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     user_role = models.ForeignKey(UserRole, on_delete=models.SET_NULL, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    thumbnail = models.ImageField(null=True, blank=True, default='defaults/NAME.png', upload_to='users/')
+    thumbnail = models.ImageField(null=True, blank=True, default='defaults/default_user_piq.jpeg', upload_to='users/')
     created = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'username'

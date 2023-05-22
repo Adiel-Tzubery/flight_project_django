@@ -8,7 +8,7 @@ class CustomUser(UserAdmin):
     model = User
 
 
-myModels = [UserRole, Administrator, AirlineCompany, Customer, Ticket, Country, Flight]
-admin.site.register(myModels)
-admin.site.register(User, CustomUser)
+# myModels = [ Country, Flight, Ticket, UserRole, Administrator, Customer, AirlineCompany]
+# admin.site.register(myModels)
+# admin.site.register(User, CustomUser)
 
