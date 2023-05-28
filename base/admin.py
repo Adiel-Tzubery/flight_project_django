@@ -11,4 +11,3 @@ class CustomUser(UserAdmin):
 # myModels = [ Country, Flight, Ticket, UserRole, Administrator, Customer, AirlineCompany]
 # admin.site.register(myModels)
 # admin.site.register(User, CustomUser)
-

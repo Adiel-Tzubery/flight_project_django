@@ -1,4 +1,7 @@
 from django.db import models
+
+# Create your models here.
+from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 
 # Create your models here.
@@ -15,7 +18,6 @@ class Flight(models.Model):
     landing_time = models.DateTimeField()
     remaining_tickets = models.IntegerField()
     price = models.IntegerField()
-
 
 class Ticket(models.Model):
     customer_id = models.ForeignKey('Customer', on_delete=models.CASCADE)

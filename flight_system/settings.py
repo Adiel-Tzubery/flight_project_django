@@ -81,12 +81,12 @@ WSGI_APPLICATION = 'flight_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'flight_system_db',
-        'USER': 'root',
+        'USER': 'postgres',
         'PASSWORD': 'admin1234',
         'HOST': 'localhost',
-        'PORT': '3306',
+        'PORT': '5432',
     }
 }
 
