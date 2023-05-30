@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from base.models import Country, AirlineCompany, Flight, Customer, Ticket, Administrator, User
+from base.models import AirlineCompany, Flight, Customer, Ticket, User
 
 
 
@@ -67,7 +67,7 @@ class DAL:
         country = DAL.get_by_id('Country', id)
         try:
             airlines = AirlineCompany.objects.filter(country__id=id).all()
-            if not airlines:
+            if not airlines.exists():
                 raise ObjectDoesNotExist(f'There are no airlines in {country}')
             return airlines
         except ObjectDoesNotExist:
@@ -88,7 +88,7 @@ class DAL:
         
 
     @staticmethod
-    def get_flight_by_destination_country_id(id):
+    def get_flights_by_destination_country_id(id):
         """ gel all the flights that landing in a country """
         destination_country = DAL.get_by_id('Country', id)
         try:
@@ -121,3 +121,59 @@ class DAL:
             return flights
         except ObjectDoesNotExist:
             raise ObjectDoesNotExist(f'There are no flights landing in {date}')
+        
+    
+    @staticmethod
+    def get_flights_by_customer(customer):
+        try:
+            tickets = Ticket.objects.filter(customer=customer)
+            if not tickets.exists():
+                raise ObjectDoesNotExist
+            flights = [ticket.flight for ticket in tickets]
+            if not flights:
+                raise ObjectDoesNotExist
+            return flights
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(f"{customer.first_name} hasn't booked any flight")
+        
+
+    #@@@@@@@@@@@@@@@@@@@@@ MODEL'S METHODS @@@@@@@@@@@@@@@@@@@@@#
+
+    @staticmethod
+    def get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None):
+        Flight.get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None)
+
+
+    @staticmethod
+    def get_flights_by_airline_id(airline_id):
+        Flight.get_flights_by_airline_id(airline_id)
+
+
+    @staticmethod
+    def get_arrival_flights(country_id):
+        Flight.get_arrival_flights(country_id)
+
+
+    @staticmethod
+    def get_departure_flights(country_id):
+        Flight.get_departure_flights(country_id)
+
+
+    @staticmethod
+    def get_tickets_by_customer(customer_id):
+        Ticket.get_tickets_by_customer(customer_id)
+
+
+    @staticmethod
+    def get_user_by_username(username):
+        User.get_user_by_username(username)
+
+
+    @staticmethod
+    def get_customer_by_username(username):
+        Customer.get_customer_by_username(username)
+
+
+    @staticmethod
+    def get_airline_by_username(username):
+        AirlineCompany.get_airline_by_username(username)
