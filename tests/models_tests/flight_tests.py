@@ -43,14 +43,14 @@ class FlightModelTest(TestCase):
         )
 
 
-    # def test_get_flights_by_parameters_success_with_all_parameters(self):
-    #     # Test if the method returns the flights as expected when entering the right parameters(all of theme)
-    #     departure_time = datetime(2023,4,16,10,30, tzinfo=timezone.utc)
-    #     origin_country_id = FlightModelTest.country.id
-    #     destination_country_id = self.flight.destination_country.id
-    #     expected_flights = [self.flight]
-    #     flights = Flight.get_flights_by_parameters(origin_country_id, destination_country_id, departure_time)
-    #     self.assertCountEqual(flights, expected_flights)
+    def test_get_flights_by_parameters_success_with_all_parameters(self):
+        # Test if the method returns the flights as expected when entering the right parameters(all of theme)
+        departure_time = datetime(2023,4,16,10,30, tzinfo=timezone.utc)
+        origin_country_id = FlightModelTest.country.id
+        destination_country_id = self.flight.destination_country.id
+        expected_flights = [self.flight]
+        flights = Flight.get_flights_by_parameters(origin_country_id, destination_country_id, departure_time)
+        self.assertCountEqual(flights, expected_flights)
 
 
     # def test_get_flights_by_parameters_success_only_with_origin_and_destination_countries(self):
