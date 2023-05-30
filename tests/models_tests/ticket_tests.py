@@ -2,13 +2,12 @@ from django.test import TestCase
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-from base.models import Country, AirlineCompany, Flight, Customer, Ticket, User
+from base.models import Country, AirlineCompany, Flight, Customer, Ticket, User, UserRole
 
 
 class TicketModelTests(TestCase):
     @classmethod
-    def setUpTestData(cls):
-        
+    def setUpTestData(cls):      
         cls.create_customer()
         cls.create_airline_company()
         cls.create_flights()
@@ -17,14 +16,16 @@ class TicketModelTests(TestCase):
     @classmethod
     def create_customer(cls):
         # create customer object for the whole test class
-        cls.user = User.objects.create(username='avigel', password='password', email='avigel@gmail.com', user_role='customer')
-        cls.customer = Customer.objects.create(first_name='Avigel', last_name='Tzubery', address='Kfar Hanoar, kfar Hsidim bet', phone_number='555-555-5555', credit_card_number='2354624632', user=cls.user)
+        cls.customer_rol = UserRole.objects.create(role_name='customer')
+        cls.user = User.objects.create_user(username='avigel', password='password', email='avigel@gmail.com', user_role=cls.customer_rol)
+        cls.customer = Customer.objects.create(first_name='Avigel', last_name='Tzubery', address='Kfar Hanoar, kfar Hsidim bet', phone_no='555-555-5555', credit_card_no='2354624632', user=cls.user)
 
 
     @classmethod
     def create_airline_company(cls):
         # Create airline company object for the whole test class
-        cls.airline_user = User.objects.create(username='Beng', password='password', email='bg@gmail.com', user_role='airline company')
+        cls.airline_rol = UserRole.objects.create(role_name='airline company')
+        cls.airline_user = User.objects.create_user(username='Beng', password='password', email='bg@gmail.com', user_role=cls.airline_rol)
         cls.country = Country.objects.create(name='Israel')
         cls.airline_company = AirlineCompany.objects.create(name='Ben Guryon Airline', country=cls.country, user=cls.airline_user)
 
@@ -43,7 +44,8 @@ class TicketModelTests(TestCase):
             destination_country = destination_country,
             departure_time = departure_time,
             landing_time = landing_time,
-            remaining_tickets = remaining_tickets
+            remaining_tickets = remaining_tickets,
+            price = 99
         )
         cls.second_flight = Flight.objects.create(
             airline_company = TicketModelTests.airline_company,
@@ -51,7 +53,8 @@ class TicketModelTests(TestCase):
             destination_country = Country.objects.create(name='Spain'),
             departure_time = departure_time,
             landing_time = landing_time,
-            remaining_tickets = remaining_tickets
+            remaining_tickets = remaining_tickets,
+            price = 99
         )
 
 
@@ -82,8 +85,8 @@ class TicketModelTests(TestCase):
     def test_get_tickets_by_customer_without_any_tickets_spesific_customer(self):
         # test that the method return only the customer id's much's tickets
         customer_id = TicketModelTests.customer.id
-        user = User.objects.create(username='adielt', password='password', email='adiel@gmail.com', user_role='customer')
-        adiel = Customer.objects.create(first_name='adiel', last_name='Tzubery', address='Kfar Hanoar, kfar Hsidim bet', phone_number='666-666-6666', credit_card_number='7654565436', user=user)
+        user = User.objects.create_user(username='adielt', password='password', email='adiel@gmail.com', user_role=TicketModelTests.customer_rol)
+        adiel = Customer.objects.create(first_name='adiel', last_name='Tzubery', address='Kfar Hanoar, kfar Hsidim bet', phone_no='666-666-6666', credit_card_no='7654565436', user=user)
         a_tickets = Ticket.objects.create(flight=TicketModelTests.first_flight, customer=adiel)
         adiel_tickets = Ticket.get_tickets_by_customer(adiel.id)
         tickets = Ticket.get_tickets_by_customer(customer_id)

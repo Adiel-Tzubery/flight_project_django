@@ -1,5 +1,5 @@
 from django.test import TestCase
-from base.models import User, Customer
+from base.models import User, Customer, UserRole
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -8,12 +8,13 @@ class CustomerModelTests(TestCase):
 
     def setUp(self):
         """ creating a test customer object. """
-        self.user = User.objects.create(username='adieltzu', password='password', email='shalom@gmail.com', user_role='Customer')
+        self.user_role = UserRole.objects.create(role_name='Customer')
+        self.user = User.objects.create_user(username='adieltzu', password='password', email='shalom@gmail.com', user_role=self.user_role)
         self.customer = Customer.objects.create(first_name='Adiel',
                                                 last_name='Tzubery',
                                                 address='Kfar-Hasidim',
-                                                phone_number='056-9856925',
-                                                credit_card_number='0452-0527-9856-9874',
+                                                phone_no='056-9856925',
+                                                credit_card_no='0452-0527-9856-9874',
                                                 user=self.user)
 
 

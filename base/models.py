@@ -1,4 +1,6 @@
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from datetime import datetime, timedelta
 
 # Create your models here.
 from django.db import models
@@ -11,20 +13,80 @@ class Country(models.Model):
 
 
 class Flight(models.Model):
-    airline_company_id = models.ForeignKey('AirlineCompany', on_delete=models.CASCADE)
-    origin_country_id = models.ForeignKey(Country, related_name='origin_country', on_delete=models.CASCADE)
-    destination_country_id = models.ForeignKey(Country, related_name='destination_country', on_delete=models.CASCADE)
+    airline_company= models.ForeignKey('AirlineCompany', on_delete=models.CASCADE, related_name='flights')
+    origin_country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='origin_country')
+    destination_country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='destination_country')
     departure_time = models.DateTimeField()
     landing_time = models.DateTimeField()
     remaining_tickets = models.IntegerField()
     price = models.IntegerField()
 
+
+    def clean(self):
+        if self.departure_time >= self.landing_time:
+            raise ValidationError('Landing time must be after the departure time')
+        
+
+    #@@@@@@@@@@@@@@@@@ do the get flight by patrameters @@@@@@@@@@@@@@@@@@#
+
+
+    @staticmethod
+    def get_flights_by_airline_id(airline_id):
+        try:
+            flights = Flight.objects.filter(airline_company_id=airline_id)
+            if not flights.exists():
+                raise ObjectDoesNotExist
+            else:
+                return flights
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(f'There are no flights from airline {airline_id}')
+        
+
+    @staticmethod
+    def get_arrival_flights(country_id):
+        try:
+            flights = Flight.objects.filter(destination_country_id=country_id, landing_time__gte=datetime.now(), landing_time__lte=datetime.now()+timedelta(hours=12))
+            if not flights.exists():
+                raise ObjectDoesNotExist
+            return flights
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist('No arriving flights in the next 12 hours')
+        
+
+    @staticmethod
+    def get_departure_flights(country_id):
+        try:
+            flights = Flight.objects.filter(origin_country_id=country_id, departure_time__gte=datetime.now(), departure_time__lte=datetime.now()+timedelta(hours=12))
+            if not flights.exists():
+                raise ObjectDoesNotExist
+            return flights
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist('No departing flight in the next 12 hours')
+
+
 class Ticket(models.Model):
-    customer_id = models.ForeignKey('Customer', on_delete=models.CASCADE)
-    flight_id = models.ForeignKey(Flight, on_delete=models.CASCADE)
+    customer = models.ForeignKey('Customer', on_delete=models.CASCADE, related_name='tickets')
+    flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name='tickets')
 
     class Meta:
-        unique_together = ('flight_id', 'customer_id')
+        unique_together = ('flight', 'customer')
+
+
+    @staticmethod
+    def get_tickets_by_customer(customer_id):
+        #getting the customer object if exists
+        try:
+            customer = Customer.objects.get(pk=customer_id)
+        except Customer.DoesNotExist:
+            raise ObjectDoesNotExist(f'No customer found with ID {customer_id}')
+        #getting the tickets, if there are any
+        try:
+            tickets = Ticket.objects.filter(customer=customer)
+            if not tickets:
+                raise Ticket.DoesNotExist
+            return tickets
+        except Ticket.DoesNotExist:
+            raise ObjectDoesNotExist(f'No tickets found for customer {customer.first_name}')
 
 
 class UserRole(models.Model):
@@ -33,21 +95,24 @@ class UserRole(models.Model):
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, username, email, password=None, **extra_fields):
+    def create_user(self, username, email, password, **kwargs):
+        if not username:
+            raise ValueError('The username field must be set')
         if not email:
-            raise ValueError('The Email field must be set')
+            raise ValueError('The email field must be set')
         if not password:
             raise ValueError('The password field must be set')
         email = self.normalize_email(email)
-        user = self.model(username=username, email=email, **extra_fields)
+        user = self.model(username=username, email=email, **kwargs)
         user.set_password(password)
         user.save(using=self._db)
+        return user
 
-    def create_superuser(self, username, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('user_role', UserRole.objects.get(role_name='admin'))
-        return self.create_user(username, email, password, **extra_fields)
+    def create_superuser(self, username, email, password, **kwargs):
+        kwargs.setdefault('is_staff', True)
+        kwargs.setdefault('is_superuser', True)
+        kwargs.setdefault('user_role', UserRole.objects.get(role_name='admin'))
+        return self.create_user(username, email, password, **kwargs)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -56,7 +121,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     user_role = models.ForeignKey(UserRole, on_delete=models.SET_NULL, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    thumbnail = models.ImageField(null=True, blank=True, default='defaults/default_user_piq.jpeg', upload_to='users/')
+    profile_piq = models.ImageField(null=True, blank=True, default='defaults/default_user_piq.jpeg', upload_to='users/')
     created = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'username'
@@ -68,19 +133,36 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Administrator(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='administrators')
 
 
 class Customer(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    credit_card_no = models.CharField(max_length=16, unique=True)
-    phone_no = models.CharField(max_length=10 ,unique=True)
+    credit_card_no = models.CharField(max_length=19, unique=True)
+    phone_no = models.CharField(max_length=13, unique=True)
     address = models.TextField()
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customers')
+
+
+    @staticmethod
+    def get_customer_by_username(username):
+        try:
+            return Customer.objects.select_related('user').get(user__username=username)
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(f'Customer with username {username} does not exist')
 
 
 class AirlineCompany(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    country_id = models.ForeignKey(Country, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='airline_companies')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='airline_companies')
+
+    @staticmethod
+    def get_airline_by_username(username):
+        try:
+            return AirlineCompany.objects.select_related('user').get(user__username=username)
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(f'Airline with username {username} does not exist')
+
+
