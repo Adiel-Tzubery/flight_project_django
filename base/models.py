@@ -160,6 +160,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
 
+    @staticmethod
+    def get_user_by_username(username):
+        try:
+            return User.objects.get(username=username)
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(f'No user found with username: {username}')
+
+
 class Administrator(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)

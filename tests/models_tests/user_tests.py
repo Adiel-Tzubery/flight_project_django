@@ -10,12 +10,12 @@ class UserModelTests(TestCase):
         """ creating a test user object. """
         self.user_role = UserRole.objects.create(role_name='Administrator')
         self.user = User.objects.create(username='shalomlecha', password='password', email='shalom@gmail.com', user_role=self.user_role)
-        self.administrator = Administrator.objects.create(first_name='shalom', last_name='lecha', user_id=self.user)
+        self.administrator = Administrator.objects.create(first_name='shalom', last_name='lecha', user=self.user)
         
     
     def test_get_user_by_username_success(self):
         """ Test that the method returns user object for an existing one. """
-        user = self.administrator.user_id.get_user_by_username(username='shalomlecha')
+        user = self.administrator.user.get_user_by_username(username='shalomlecha')
         self.assertEqual(user.username, 'shalomlecha')
 
 
