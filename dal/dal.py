@@ -26,6 +26,8 @@ class DAL:
     def create(model,**kwargs):
         """ add an instance to a model """
         try:
+            if model == User:
+                obj = model.objects.create_user(**kwargs)
             obj = model.objects.create(**kwargs)
             return obj
         except ValidationError as e:
@@ -142,6 +144,11 @@ class DAL:
     @staticmethod
     def get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None):
         Flight.get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None)
+
+
+    @staticmethod
+    def get_airlines_by_parameters(name=None, country_id=None):
+        AirlineCompany.get_airlines_by_parameters(name=None, country_id=None)
 
 
     @staticmethod

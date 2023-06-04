@@ -28,7 +28,7 @@ class Flight(models.Model):
     @staticmethod
     def get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None):
         """ method that get's all the flights according to parameters if there is any,
-            if there isn't the method will return all the flights, if there is any. """
+            if there isn't, the method will return all the flights, if there is any. """
 
         # inserting all the existing conditions to a q
         filter_conditions = Q()
@@ -121,7 +121,7 @@ class Ticket(models.Model):
 
 class UserRole(models.Model):
     role_name = models.CharField(max_length=50, unique=True)
-    # group = models.OneToOneField(Group, blank=True, null=True, on_delete=models.CASCADE)
+    group = models.OneToOneField(Group, blank=True, null=True, on_delete=models.CASCADE)
 
 
 class CustomUserManager(BaseUserManager):
@@ -141,7 +141,7 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, username, email, password, **kwargs):
         kwargs.setdefault('is_staff', True)
         kwargs.setdefault('is_superuser', True)
-        kwargs.setdefault('user_role', UserRole.objects.get(role_name='admin'))
+        kwargs.setdefault('user_role', UserRole.objects.get(role_name='administrator'))
         return self.create_user(username, email, password, **kwargs)
 
 
@@ -151,7 +151,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     user_role = models.ForeignKey(UserRole, on_delete=models.SET_NULL, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    profile_piq = models.ImageField(null=True, blank=True, default='defaults/default_user_piq.jpeg', upload_to='users/')
+    profile_pic = models.ImageField(null=True, blank=True, default='defaults/default_user_piq.jpeg', upload_to='users/')
     created = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'username'
@@ -204,3 +204,32 @@ class AirlineCompany(models.Model):
             raise ObjectDoesNotExist(f'Airline with username {username} does not exist')
 
 
+    @staticmethod
+    def get_airlines_by_parameters(name=None, country_id=None):
+        """ method that get's all the airlines according to parameters if there is any,
+            if there isn't, the method will return all the airlines, if there is any. """
+        # inserting all the existing conditions to a q
+        filter_conditions = Q()
+
+        if name is not None:
+            filter_conditions &= Q(name=name)
+        if country_id is not None:
+            filter_conditions &= Q(country=country_id)
+
+        # if there are no conditions
+        if not filter_conditions:
+            try:
+                airlines = AirlineCompany.objects.all()
+                if not airlines.exists():
+                    raise ObjectDoesNotExist
+            except ObjectDoesNotExist:
+                raise ObjectDoesNotExist('There are no airlines')
+            
+        # applying the conditions
+        try:
+            airlines = AirlineCompany.objects.filter(filter_conditions)
+            if not airlines.exists():
+                raise ObjectDoesNotExist
+            return airlines
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist('There are no airlines matching the parameter/s')

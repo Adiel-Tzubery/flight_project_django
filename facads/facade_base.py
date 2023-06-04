@@ -1,40 +1,41 @@
-
+from base.models import *
+from dal.dal import DAL
 
 
 
 class FacadeBase:
 
     def get_all_flights():
-        pass
+        DAL.get_all(Flight)
 
 
     def get_flight_by_id(id):
-        pass
+        DAL.get_by_id(Flight, id)
 
 
     def get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None):
-        pass
+        DAL.get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None)
 
 
     def get_all_airlines():
-        pass
+        DAL.get_all(AirlineCompany)
 
 
     def get_airline_by_id(id):
-        pass
+        DAL.get_by_id(AirlineCompany, id)
 
-
-    def get_airline_by_parameters(**enter args):
-        pass
+    @staticmethod
+    def get_airline_by_parameters(name, country_id):
+        DAL.get_airlines_by_parameters(name, country_id)
 
 
     def get_all_countries():
-        pass
+        DAL.get_all(Country)
 
 
     def get_country_by_id(id):
-        pass
+        DAL.get_by_id(Country, id)
 
 
-    def create_new_user(**enter args):
-        pass
+    def create_new_user(username, email, password, **kwargs):
+        DAL.create(User, username, email, password, **kwargs)
