@@ -9,5 +9,9 @@ class AnonymousFacade(FacadeBase):
         pass
 
 
+    def create_new_user(username, email, password, **kwargs):
+        DAL.create(User, username, email, password, **kwargs)
+
+
     def add_customer():
         pass

@@ -64,6 +64,17 @@ class DAL:
     
 
     @staticmethod
+    def get_customer_by_phone_and_credit_card(phone_no, credit):
+        try:
+            customer = Customer.objects.filter(phone_no=phone_no, credit_card_no=credit)
+            if not customer.exists():
+                raise ObjectDoesNotExist
+            return customer
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(f'no customer with credit card number: {credit} or phone: {phone_no} exists')
+        
+
+    @staticmethod
     def get_airlines_by_country_id(id):
         """ get all the airlines of a country if there is any """
         country = DAL.get_by_id('Country', id)

@@ -35,7 +35,3 @@ class FacadeBase:
 
     def get_country_by_id(id):
         DAL.get_by_id(Country, id)
-
-
-    def create_new_user(username, email, password, **kwargs):
-        DAL.create(User, username, email, password, **kwargs)
