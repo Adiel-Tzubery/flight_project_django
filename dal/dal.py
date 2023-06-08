@@ -27,8 +27,12 @@ class DAL:
         """ add an instance to a model """
         try:
             if model == User:
-                obj = model.objects.create_user(**kwargs)
-            obj = model.objects.create(**kwargs)
+                if kwargs['administrator']:
+                    obj = model.objects.create_superuser(**kwargs)
+                else:
+                    obj = model.objects.create_user(**kwargs)
+            else:
+                obj = model.objects.create(**kwargs)
             return obj
         except ValidationError as e:
             raise ValidationError(f'Error creating {model}: {str(e)}')
@@ -178,13 +182,18 @@ class DAL:
 
 
     @staticmethod
-    def get_tickets_by_customer(customer_id):
-        Ticket.get_tickets_by_customer(customer_id)
+    def get_tickets_by_customer_id(customer_id):
+        Ticket.get_tickets_by_customer_id(customer_id)
 
 
     @staticmethod
     def get_user_by_username(username):
         User.get_user_by_username(username)
+
+
+    @staticmethod
+    def get_user_by_emil(email):
+        User.get_user_by_email(email)
 
 
     @staticmethod

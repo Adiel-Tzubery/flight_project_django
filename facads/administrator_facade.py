@@ -1,10 +1,10 @@
-from .facade_base import FacadeBase
+from .facade_base import FacadeBase, FacadsValidator
 from .anonymous_facade import AnonymousFacade
-from base.models import Customer, AirlineCompany
+from base.models import Customer, AirlineCompany, User
 from dal.dal import DAL
 
 
-class AdministratorFacade(FacadeBase):
+class AdministratorFacade(FacadeBase, FacadsValidator):
 
 
     def get_all_customers():
@@ -41,16 +41,33 @@ class AdministratorFacade(FacadeBase):
     #         raise Exception('customer already exist')
 
 
-    def add_administrator():
-        pass
+    def add_administrator(**kwargs):
+        try: # check if username and email are available.
+            username = kwargs['username']
+            email = kwargs['email']
+            if AdministratorFacade.is_username_or_email_exists(username, email):
+                administrator = DAL.create(User, kwargs)
+                return administrator
+            raise Exception
+        except Exception:
+            raise Exception
 
 
     def remove_airline(airline):
-        pass
+        try: # check if airline exists.
+            if AdministratorFacade.is_airline_clear_for_delete(airline):
+                DAL.remove(AirlineCompany, airline.id)
+        except Exception:
+            raise Exception
 
 
     def remove_customer(customer):
-        pass
+        try: # check if customer exists.
+            if AdministratorFacade.is_customer_clear_for_delete(customer):
+                DAL.remove(Customer, customer.id)
+        except Exception:
+            raise Exception
+
 
 
     def remove_administrator(administrator):

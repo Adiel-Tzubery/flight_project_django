@@ -103,7 +103,7 @@ class Ticket(models.Model):
 
 
     @staticmethod
-    def get_tickets_by_customer(customer_id):
+    def get_tickets_by_customer_id(customer_id):
         #getting the customer object if exists
         try:
             customer = Customer.objects.get(pk=customer_id)
@@ -166,6 +166,14 @@ class User(AbstractBaseUser, PermissionsMixin):
             return User.objects.get(username=username)
         except ObjectDoesNotExist:
             raise ObjectDoesNotExist(f'No user found with username: {username}')
+        
+
+    @staticmethod
+    def get_user_by_email(email):
+        try:
+            return User.objects.filter(email=email)
+        except ObjectDoesNotExist:
+            raise  ObjectDoesNotExist(f'No user found with email: {email}')
 
 
 class Administrator(models.Model):
