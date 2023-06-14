@@ -68,14 +68,25 @@ class DAL:
     
 
     @staticmethod
-    def get_customer_by_phone_and_credit_card(phone_no, credit):
+    def get_customer_by_phone(phone_no):
         try:
-            customer = Customer.objects.filter(phone_no=phone_no, credit_card_no=credit)
+            customer = Customer.objects.filter(phone_no=phone_no)
             if not customer.exists():
-                raise ObjectDoesNotExist
+                raise ObjectDoesNotExist(f'no customer with phone: {phone_no} exists')
             return customer
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f'no customer with credit card number: {credit} or phone: {phone_no} exists')
+            raise ObjectDoesNotExist(f'no customer with phone: {phone_no} exists')
+        
+
+    @staticmethod
+    def get_customer_by_credit(credit):
+        try:
+            customer = Customer.objects.filter(credit_card_no=credit)
+            if not customer.exists():
+                raise ObjectDoesNotExist(f'no customer with credit number: {credit} exists')
+            return customer
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(f'no customer with credit number: {credit} exists')
         
 
     @staticmethod

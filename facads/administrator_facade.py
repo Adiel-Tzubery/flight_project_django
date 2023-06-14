@@ -1,10 +1,10 @@
 from .facade_base import FacadeBase, FacadsValidator
 from .anonymous_facade import AnonymousFacade
-from base.models import Customer, AirlineCompany, User
+from base.models import Customer, AirlineCompany, User, Administrator
 from dal.dal import DAL
 
 
-class AdministratorFacade(FacadeBase, FacadsValidator):
+class AdministratorFacade(FacadeBase):
 
 
     def get_all_customers():
@@ -27,25 +27,18 @@ class AdministratorFacade(FacadeBase, FacadsValidator):
 
 # @@@ needs to be review @@@
 
-    # def add_customer(**kwargs):
-    #     try:
-    #         phone = kwargs['phone_no']
-    #         credit = kwargs['credit_card_no']
-    #         customer = DAL.get_customer_by_phone(phone)
-    #         if customer.exists():
-    #             raise Exception
-    #         DAL.create(Customer, kwargs)
-    #     except KeyError:
-    #         raise KeyError('phone/credit not provided')
-    #     except Exception:
-    #         raise Exception('customer already exist')
+    def add_customer(**kwargs):
+        try:
+            customer = AnonymousFacade.add_customer(kwargs)
+        except Exception:
+            raise Exception
 
 
     def add_administrator(**kwargs):
         try: # check if username and email are available.
             username = kwargs['username']
             email = kwargs['email']
-            if AdministratorFacade.is_username_or_email_exists(username, email):
+            if FacadsValidator.is_username_or_email_exists(username, email):
                 administrator = DAL.create(User, kwargs)
                 return administrator
             raise Exception
@@ -55,7 +48,7 @@ class AdministratorFacade(FacadeBase, FacadsValidator):
 
     def remove_airline(airline):
         try: # check if airline exists.
-            if AdministratorFacade.is_airline_clear_for_delete(airline):
+            if FacadsValidator.is_airline_clear_for_delete(airline):
                 DAL.remove(AirlineCompany, airline.id)
         except Exception:
             raise Exception
@@ -63,7 +56,7 @@ class AdministratorFacade(FacadeBase, FacadsValidator):
 
     def remove_customer(customer):
         try: # check if customer exists.
-            if AdministratorFacade.is_customer_clear_for_delete(customer):
+            if FacadsValidator.is_customer_clear_for_delete(customer):
                 DAL.remove(Customer, customer.id)
         except Exception:
             raise Exception
@@ -71,4 +64,7 @@ class AdministratorFacade(FacadeBase, FacadsValidator):
 
 
     def remove_administrator(administrator):
-        pass
+        try:
+            DAL.remove(Administrator, administrator.id)
+        except Exception:
+            raise Exception
