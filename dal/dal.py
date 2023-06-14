@@ -50,13 +50,16 @@ class DAL:
     @staticmethod
     def update(model, id, **kwargs):
         """ update an instance of a model """
-        instance = DAL.get_by_id(model, id)
-        for key, value in kwargs.items():
-            # handle only the fields that need to be change
-            if hasattr(instance, key):
-                setattr(instance, key,  value)
-        instance.save()
-        return instance
+        try:
+            instance = DAL.get_by_id(model, id)
+            for key, value in kwargs.items():
+                # handle only the fields that need to be change
+                if hasattr(instance, key):
+                    setattr(instance, key,  value)
+            instance.save()
+            return instance
+        except Exception:
+            raise Exception
 
 
     @staticmethod
@@ -165,6 +168,17 @@ class DAL:
             raise ObjectDoesNotExist(f"{customer.first_name} hasn't booked any flight")
         
 
+    @staticmethod
+    def get_tickets_by_flight_id(flight_id):
+        try:
+            tickets = Ticket.objects.filter(flight=flight_id)
+            if tickets.exists():
+                raise ObjectDoesNotExist('Flight have not soled any tickets')
+            return tickets
+        except ObjectDoesNotExist:
+                raise ObjectDoesNotExist('Flight have not soled any tickets')
+
+
     #@@@@@@@@@@@@@@@@@@@@@ MODEL'S METHODS @@@@@@@@@@@@@@@@@@@@@#
 
     @staticmethod
@@ -179,8 +193,14 @@ class DAL:
 
     @staticmethod
     def get_flights_by_airline_id(airline_id):
-        Flight.get_flights_by_airline_id(airline_id)
-
+        try:
+            flights = Flight.get_flights_by_airline_id(airline_id)
+            if not flights.exists():
+                raise ObjectDoesNotExist('This airline has no flights')
+            return flights
+        except ObjectDoesNotExist:
+                raise ObjectDoesNotExist('This airline has no flights')
+            
 
     @staticmethod
     def get_arrival_flights(country_id):
@@ -203,7 +223,7 @@ class DAL:
 
 
     @staticmethod
-    def get_user_by_emil(email):
+    def get_user_by_email(email):
         User.get_user_by_email(email)
 
 

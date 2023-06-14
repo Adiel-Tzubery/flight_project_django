@@ -8,7 +8,11 @@ class AdministratorFacade(FacadeBase):
 
 
     def get_all_customers():
-        DAL.get_all(Customer)
+        try:
+            customers = DAL.get_all(Customer)
+            return customers
+        except Exception:
+            raise Exception
         
 
     def add_airline(**kwargs):
@@ -18,18 +22,18 @@ class AdministratorFacade(FacadeBase):
             airline = AdministratorFacade.get_airline_by_parameters(name=name)
             if airline.exists():
                 raise Exception
-            DAL.create(AirlineCompany, kwargs)
+            new_airline = DAL.create(AirlineCompany, kwargs)
+            return new_airline
         except KeyError:
             raise KeyError('name not provided')
         except Exception:
             raise Exception(f'There is already airline with name: {name}')
 
 
-# @@@ needs to be review @@@
-
     def add_customer(**kwargs):
         try:
             customer = AnonymousFacade.add_customer(kwargs)
+            return customer
         except Exception:
             raise Exception
 
@@ -46,25 +50,27 @@ class AdministratorFacade(FacadeBase):
             raise Exception
 
 
-    def remove_airline(airline):
+    def remove_airline(airline_id):
         try: # check if airline exists.
-            if FacadsValidator.is_airline_clear_for_delete(airline):
-                DAL.remove(AirlineCompany, airline.id)
+            if FacadsValidator.is_airline_clear_for_delete(airline_id):
+                DAL.remove(AirlineCompany, airline_id)
         except Exception:
             raise Exception
 
 
-    def remove_customer(customer):
+    def remove_customer(customer_id):
         try: # check if customer exists.
-            if FacadsValidator.is_customer_clear_for_delete(customer):
-                DAL.remove(Customer, customer.id)
+            if FacadsValidator.is_customer_clear_for_delete(customer_id):
+                deleted_customer = DAL.remove(Customer, customer_id)
+                return deleted_customer
         except Exception:
             raise Exception
 
 
 
-    def remove_administrator(administrator):
+    def remove_administrator(administrator_id):
         try:
-            DAL.remove(Administrator, administrator.id)
+            deleted_admin = DAL.remove(Administrator, administrator_id)
+            return deleted_admin
         except Exception:
             raise Exception

@@ -116,7 +116,7 @@ class Ticket(models.Model):
                 raise Ticket.DoesNotExist
             return tickets
         except Ticket.DoesNotExist:
-            raise ObjectDoesNotExist(f'No tickets found for customer {customer.first_name}')
+            raise ObjectDoesNotExist(f'No tickets found for customer')
 
 
 class UserRole(models.Model):
