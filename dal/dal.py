@@ -27,7 +27,7 @@ class DAL:
         """ add an instance to a model """
         try:
             if model == User:
-                if kwargs['administrator']:
+                if 'administrator' in kwargs:
                     obj = model.objects.create_superuser(**kwargs)
                 else:
                     obj = model.objects.create_user(**kwargs)
@@ -183,12 +183,12 @@ class DAL:
 
     @staticmethod
     def get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None):
-        Flight.get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None)
+        return Flight.get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None)
 
 
     @staticmethod
     def get_airlines_by_parameters(name=None, country_id=None):
-        AirlineCompany.get_airlines_by_parameters(name=None, country_id=None)
+        return AirlineCompany.get_airlines_by_parameters(name=None, country_id=None)
 
 
     @staticmethod
@@ -204,34 +204,34 @@ class DAL:
 
     @staticmethod
     def get_arrival_flights(country_id):
-        Flight.get_arrival_flights(country_id)
+        return Flight.get_arrival_flights(country_id)
 
 
     @staticmethod
     def get_departure_flights(country_id):
-        Flight.get_departure_flights(country_id)
+        return Flight.get_departure_flights(country_id)
 
 
     @staticmethod
     def get_tickets_by_customer_id(customer_id):
-        Ticket.get_tickets_by_customer_id(customer_id)
+        return Ticket.get_tickets_by_customer_id(customer_id)
 
 
     @staticmethod
     def get_user_by_username(username):
-        User.get_user_by_username(username)
+        return User.get_user_by_username(username)
 
 
     @staticmethod
     def get_user_by_email(email):
-        User.get_user_by_email(email)
+        return User.get_user_by_email(email)
 
 
     @staticmethod
     def get_customer_by_username(username):
-        Customer.get_customer_by_username(username)
+        return Customer.get_customer_by_username(username)
 
 
     @staticmethod
     def get_airline_by_username(username):
-        AirlineCompany.get_airline_by_username(username)
+        return AirlineCompany.get_airline_by_username(username)

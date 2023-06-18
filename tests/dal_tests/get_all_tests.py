@@ -30,7 +30,7 @@ class DalGetAllTests(TestCase):
         # create user, administrator and customer objects
         cls.customer_role = UserRole.objects.create(role_name='customer')
         cls.user = User.objects.create(username='avigel', password='password', email='avigel@gmail.com', user_role=cls.customer_role)
-        cls.customer = Customer.objects.create(first_name='Avigel', last_name='Tzubery', address='Kfar Hanoar, kfar Hsidim bet', phone_no='5555555', credit_card_no='2354624632', user_id=cls.user)
+        cls.customer = Customer.objects.create(first_name='Avigel', last_name='Tzubery', address='Kfar Hanoar, kfar Hsidim bet', phone_no='5555555', credit_card_no='2354624632', user_id=cls.user.id)
         
 
         # Create flights objects 

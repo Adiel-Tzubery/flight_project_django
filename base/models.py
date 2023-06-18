@@ -216,6 +216,7 @@ class AirlineCompany(models.Model):
     def get_airlines_by_parameters(name=None, country_id=None):
         """ method that get's all the airlines according to parameters if there is any,
             if there isn't, the method will return all the airlines, if there is any. """
+        
         # inserting all the existing conditions to a q
         filter_conditions = Q()
 

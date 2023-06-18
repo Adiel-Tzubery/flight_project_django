@@ -1,7 +1,7 @@
 from django.test import TestCase
 from unittest.mock import patch
 from dal.dal import DAL
-from base.models import Country, AirlineCompany, Flight, Customer, Ticket, Administrator, User
+from base.models import Country, AirlineCompany, Flight, Customer, Ticket, Administrator, User, UserRole
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -17,18 +17,21 @@ class DalUpdateTests(TestCase):
         """ set up class data with instances of classes for the tests methods """
 
         #create user, administrator objects
-        cls.admin_user = User.objects.create(username='ad', password='password', email='ad@gmail.com', user_role='administrator')
+        cls.admin_role = UserRole.objects.create(role_name='administrator')
+        cls.admin_user = User.objects.create(username='ad', password='password', email='ad@gmail.com', user_role=cls.admin_role)
         cls.administrator = Administrator.objects.create(first_name='admin', last_name='instrator', user=cls.admin_user)
 
 
         # create user, country and airline objects
-        cls.airline_user = User.objects.create(username='Beng', password='password', email='bg@gmail.com', user_role='airline company')
+        cls.airline_role = UserRole.objects.create(role_name='airline company')
+        cls.airline_user = User.objects.create(username='Beng', password='password', email='bg@gmail.com', user_role=cls.airline_role)
         cls.country = Country.objects.create(name='Israel')
         cls.airline_company = AirlineCompany.objects.create(name='Ben Guryon Airline', country=cls.country, user=cls.airline_user)
 
         # create user, administrator and customer objects
-        cls.user = User.objects.create(username='avigel', password='password', email='avigel@gmail.com', user_role='customer')
-        cls.customer = Customer.objects.create(first_name='Avigel', last_name='Tzubery', address='Kfar Hanoar, kfar Hsidim bet', phone_number='555-555-5555', credit_card_number='2354624632', user=cls.user)
+        cls.customer_role = UserRole.objects.create(role_name='customer')
+        cls.user = User.objects.create(username='avigel', password='password', email='avigel@gmail.com', user_role=cls.customer_role)
+        cls.customer = Customer.objects.create(first_name='Avigel', last_name='Tzubery', address='Kfar Hanoar, kfar Hsidim bet', phone_no='555-555-5555', credit_card_no='2354624632', user=cls.user)
         
 
         # Create flights objects 
@@ -43,7 +46,8 @@ class DalUpdateTests(TestCase):
             destination_country = destination_country,
             departure_time = departure_time,
             landing_time = landing_time,
-            remaining_tickets = remaining_tickets
+            remaining_tickets = remaining_tickets,
+            price = 99
         )
         cls.second_flight = Flight.objects.create(
             airline_company = DalUpdateTests.airline_company,
@@ -51,7 +55,8 @@ class DalUpdateTests(TestCase):
             destination_country = Country.objects.create(name='Spain'),
             departure_time = departure_time,
             landing_time = landing_time,
-            remaining_tickets = remaining_tickets
+            remaining_tickets = remaining_tickets,
+            price = 99
         )
 
         cls.first_ticket = Ticket.objects.create(flight=cls.first_flight, customer=cls.customer)

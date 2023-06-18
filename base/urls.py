@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import base_views, administrator_views, anonymous_views, airline_views
+from .views import base_views, administrator_views, anonymous_views, airline_views, customer_views
 
 urlpatterns = [
 
@@ -41,5 +41,11 @@ urlpatterns = [
     path('airline/update-flight', airline_views.update_flight, name='update=flight'),
     path('airline/remove-flight', airline_views.remove_flight, name='remove_flight'),
     path('airline/my-flight', airline_views.get_my_flight, name='my-flights'),
-    
+
+    # Customer views
+
+    path('customer/update-customer/', customer_views.update_customer, name='update-customer'),
+    path('customer/add-ticket/', customer_views.add_ticket, name='add-ticket'),
+    path('customer/remove-ticket', customer_views.remove_ticket, name='remove-ticket'),
+    path('customer/my-tickets', customer_views.get_my_tickets, name='my-tickets'),
 ]
