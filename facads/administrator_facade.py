@@ -53,7 +53,8 @@ class AdministratorFacade(FacadeBase):
     def remove_airline(airline_id):
         try: # check if airline exists.
             if FacadsValidator.is_airline_clear_for_delete(airline_id):
-                DAL.remove(AirlineCompany, airline_id)
+                deleted_airline = DAL.remove(AirlineCompany, airline_id)
+                return deleted_airline
         except Exception:
             raise Exception
 

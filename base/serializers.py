@@ -36,3 +36,9 @@ class AdministratorModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Administrator
         fields = '__all__'
+
+
+class TicketModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = '__all__'

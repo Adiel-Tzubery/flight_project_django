@@ -49,18 +49,16 @@ class AirlineFacade(FacadeBase):
             raise Exception
             
 
-
-
     def remove_flight(flight_id):
         try: # check if flight soled any tickets.
-            if DAL.get_tickets_by_flight_id(flight_id):
+            tickets = DAL.get_tickets_by_flight_id(flight_id)
+            if tickets.exists(): 
                 raise Exception('This flight have sold Tickets: cannot be deleted')
             deleted_flight = DAL.remove(Flight, flight_id)
             return deleted_flight
             # return something
         except Exception:
-            raise Exception('This flight have sold Tickets: cannot be deleted')
- 
+            raise ('This flight have sold Tickets: cannot be deleted')
 
 
     def get_my_flights(airline_id):

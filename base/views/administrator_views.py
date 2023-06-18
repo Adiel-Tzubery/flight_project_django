@@ -48,14 +48,19 @@ def add_administrator(request, **kwargs):
 @api_view(['DELETE'])
 def remove_airline(request, airline_id):
     try:
-
+        deleted_airline = AdministratorFacade.remove_airline(airline_id)
+        if deleted_airline:
+            return Response({'message': 'Airline deleted successfully.'})
+    except Exception:
+        return Response({'message': 'Airline cannot be deleted.'}, status=409)
 
 
 @api_view(['DELETE'])
 def remove_customer(request, customer_id):
     try:
-        AdministratorFacade.remove_customer(customer_id):
-        return Response({'message': 'Customer deleted successfully.'})
+        deleted_customer = AdministratorFacade.remove_customer(customer_id)
+        if deleted_customer:
+            return Response({'message': 'Customer deleted successfully.'})
     except Exception:
         return Response({'message': 'Customer cannot be deleted.'}, status=409)
 
@@ -63,4 +68,9 @@ def remove_customer(request, customer_id):
 
 @api_view(['DELETE'])
 def remove_administrator(request, administrator_id):
-    pass
+    try:
+        deleted_admin = AdministratorFacade.remove_administrator(administrator_id)
+        if deleted_admin:
+            return Response({'message': 'Administrator deleted successfully.'})
+    except Exception:
+        return Response({'message': 'Administrator cannot be deleted.'}, status=409)
