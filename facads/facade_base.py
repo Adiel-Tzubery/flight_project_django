@@ -126,7 +126,7 @@ class FacadsValidator:
                 if flights.exists():
                     return False
                 return True # if valid
-                raise ObjectDoesNotExist(f'There are no airline with id: {airline_id}.') 
+            raise ObjectDoesNotExist(f'There are no airline with id: {airline_id}.') 
         except ObjectDoesNotExist:
             raise ObjectDoesNotExist(f'There are no airline with id: {airline_id}.')
         
