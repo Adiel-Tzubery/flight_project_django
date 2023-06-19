@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 from base.models import User, AirlineCompany, Country, Flight, UserRole
 from datetime import datetime, timedelta
 from django.utils import timezone

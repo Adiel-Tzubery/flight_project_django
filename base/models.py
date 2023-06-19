@@ -40,15 +40,14 @@ class Flight(models.Model):
         if date is not None:
             filter_conditions &= Q(departure_time__date=date)
 
-        # if there are no conditions
-        if not filter_conditions:
+        if not filter_conditions: # if there are no conditions
             try:
                 flights = Flight.objects.all()
                 if not flights.exists():
                     raise ObjectDoesNotExist
                 return flights
             except ObjectDoesNotExist:
-                raise ObjectDoesNotExist('There are no flights')
+                raise ObjectDoesNotExist('There are no flights.')
             
         # applying the conditions
         try:
@@ -57,7 +56,7 @@ class Flight(models.Model):
                 raise ObjectDoesNotExist
             return flights
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist('There are no flights matching the parameter/s')
+            raise ObjectDoesNotExist('No flights found with the specified parameters.')
 
 
     @staticmethod
@@ -125,7 +124,7 @@ class UserRole(models.Model):
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, username, email, password, **kwargs):
+    def create_user(self, username, email, password, user_role, **kwargs):
         if not username:
             raise ValueError('The username field must be set')
         if not email:
@@ -133,7 +132,8 @@ class CustomUserManager(BaseUserManager):
         if not password:
             raise ValueError('The password field must be set')
         email = self.normalize_email(email)
-        user = self.model(username=username, email=email, **kwargs)
+        role = UserRole.objects.get(role_name=user_role)
+        user = self.model(username=username, email=email, user_role=role, **kwargs)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -171,9 +171,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     @staticmethod
     def get_user_by_email(email):
         try:
-            return User.objects.filter(email=email)
-        except ObjectDoesNotExist:
-            raise  ObjectDoesNotExist(f'No user found with email: {email}')
+            user = User.objects.filter(email=email).first()
+            if not user:
+                raise ObjectDoesNotExist(f'No user found with email: {email}.')
+            return user
+        except User.DoesNotExist:
+            raise  ObjectDoesNotExist(f'No user found with email: {email}.')
 
 
 class Administrator(models.Model):
@@ -194,9 +197,10 @@ class Customer(models.Model):
     @staticmethod
     def get_customer_by_username(username):
         try:
-            return Customer.objects.select_related('user').get(user__username=username)
-        except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f'Customer with username {username} does not exist')
+            customer = Customer.objects.select_related('user').get(user__username=username)
+            return customer
+        except Customer.DoesNotExist:
+            raise ObjectDoesNotExist(f'Customer with username {username} does not exist.')
 
 
 class AirlineCompany(models.Model):
@@ -207,9 +211,10 @@ class AirlineCompany(models.Model):
     @staticmethod
     def get_airline_by_username(username):
         try:
-            return AirlineCompany.objects.select_related('user').get(user__username=username)
-        except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f'Airline with username {username} does not exist')
+            airline = AirlineCompany.objects.select_related('user').get(user__username=username)
+            return airline
+        except AirlineCompany.DoesNotExist:
+            raise ObjectDoesNotExist(f'Airline with username {username} does not exist.')
 
 
     @staticmethod
@@ -241,4 +246,4 @@ class AirlineCompany(models.Model):
                 raise ObjectDoesNotExist
             return airlines
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist('There are no airlines matching the parameter/s')
+            raise ObjectDoesNotExist('No airlines found with the specified parameters.')

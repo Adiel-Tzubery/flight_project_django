@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from base.models import AirlineCompany, Flight, Customer, Ticket, User
+from base.models import AirlineCompany, Flight, Customer, Ticket, User, Country
 
 
 
@@ -11,31 +11,42 @@ class DAL:
     def get_by_id(model, id):
         """ get an instance of a model by his id """
         try:
-            return model.objects.get(pk=id)
+            instance =  model.objects.get(pk=id)
+            return instance
         except model.DoesNotExist:
-            raise ObjectDoesNotExist(f'No {model} found with id {id}')
+            raise ObjectDoesNotExist(f'No {model.__name__} found with id {id}')
+        except Exception as e:
+            raise Exception(f'Error occurred while retrieving instance of model: {model.__name__}, error: {str(e)}')
 
 
     @staticmethod
     def get_all(model):
         """ get all instances of a model """
-        return model.objects.all()
+        try:
+            instances = model.objects.all()
+            if not instances.exists():
+                raise ObjectDoesNotExist(f'No instances found for model: {model.__name__}.')
+            return instances
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(f'No instances found for model: {model.__name__}.')
+        except Exception as e:
+            raise Exception(f'Error occurred while retrieving instances of model: {model.__name}, error: {str(e)}.')
+        
     
 
     @staticmethod
     def create(model,**kwargs):
         """ add an instance to a model """
         try:
-            if model == User:
-                if 'administrator' in kwargs:
-                    obj = model.objects.create_superuser(**kwargs)
-                else:
-                    obj = model.objects.create_user(**kwargs)
+            if 'administrator' in kwargs.values():
+                obj = model.objects.create_superuser(**kwargs)
+            elif 'customer' in kwargs.values() or 'airline company' in kwargs.values():
+                obj = model.objects.create_user(**kwargs)
             else:
                 obj = model.objects.create(**kwargs)
             return obj
-        except ValidationError as e:
-            raise ValidationError(f'Error creating {model}: {str(e)}')
+        except Exception as e:
+            raise Exception(f'Error occurred while creating instance of model: {model.__name__}, error: {str(e)}.')
         
 
     @staticmethod
@@ -44,7 +55,7 @@ class DAL:
         try:
             return model.objects.bulk_create(items)
         except ValidationError as e:
-            raise Exception(f'Error bulk creating {model}: {str(e)} ')
+            raise Exception(f'Error bulk creating model: {model.__name__}, error: {str(e)} ')
         
 
     @staticmethod
@@ -58,16 +69,21 @@ class DAL:
                     setattr(instance, key,  value)
             instance.save()
             return instance
-        except Exception:
-            raise Exception
+        except model.DoesNotExist:
+            raise ObjectDoesNotExist(f'No {model.__name__} found with id {id}.')
+        except Exception as e:
+            raise Exception(f'Error updating {model.__name__}, error: {str(e)}.')
 
 
     @staticmethod
     def remove(model, id):
         """ remove an instance of a model """
-        instance = DAL.get_by_id(model, id)
-        instance.delete()
-        return instance
+        try:
+            instance = DAL.get_by_id(model, id)
+            instance.delete()
+            return instance
+        except model.DoesNotExist:
+            raise ObjectDoesNotExist(f'No {model.__name__} found with id {id}.')
     
 
     @staticmethod
@@ -75,10 +91,10 @@ class DAL:
         try:
             customer = Customer.objects.filter(phone_no=phone_no)
             if not customer.exists():
-                raise ObjectDoesNotExist(f'no customer with phone: {phone_no} exists')
+                raise ObjectDoesNotExist(f'No customer found with phone number: {phone_no}.')
             return customer
-        except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f'no customer with phone: {phone_no} exists')
+        except Customer.DoesNotExist:
+            raise ObjectDoesNotExist(f'No customer found with phone number: {phone_no}.')
         
 
     @staticmethod
@@ -86,10 +102,10 @@ class DAL:
         try:
             customer = Customer.objects.filter(credit_card_no=credit)
             if not customer.exists():
-                raise ObjectDoesNotExist(f'no customer with credit number: {credit} exists')
+                raise ObjectDoesNotExist(f'No customer found with credit number: {credit}.')
             return customer
-        except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f'no customer with credit number: {credit} exists')
+        except Customer.DoesNotExist:
+            raise ObjectDoesNotExist(f'No customer found with credit number: {credit}.')
         
 
     @staticmethod
@@ -99,10 +115,12 @@ class DAL:
         try:
             airlines = AirlineCompany.objects.filter(country__id=id).all()
             if not airlines.exists():
-                raise ObjectDoesNotExist(f'There are no airlines in {country}')
+                raise ObjectDoesNotExist(f'There are no airlines in {country.name}.')
             return airlines
+        except Country.DoesNotExist:
+            raise ObjectDoesNotExist(f'No country found with id {id}.')
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f'There are no airlines in {country}')
+            raise ObjectDoesNotExist(f'There are no airlines in {country.name}.')
 
 
     @staticmethod
@@ -112,10 +130,12 @@ class DAL:
         try:
             flights = Flight.objects.filter(origin_country__id=id).all()
             if not flights:
-                raise ObjectDoesNotExist(f'There are no flights from {origin_country}')
+                raise ObjectDoesNotExist(f'There are no flights from {origin_country.name}.')
             return flights
+        except Country.DoesNotExist:
+            raise ObjectDoesNotExist(f'No country found with id {id}.')
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f'There are no flights from {origin_country}')
+            raise ObjectDoesNotExist(f'There are no flights from {origin_country.name}.')
         
 
     @staticmethod
@@ -124,22 +144,25 @@ class DAL:
         destination_country = DAL.get_by_id('Country', id)
         try:
             flights = Flight.objects.filter(destination_country__id=id).all()
-            if not flights:
-                raise ObjectDoesNotExist(f'There are no flights to {destination_country}')
+            if not flights.exists():
+                raise ObjectDoesNotExist(f'There are no flights to {destination_country.name}.')
             return flights
+        except Country.DoesNotExist:
+            raise ObjectDoesNotExist(f'No country found with id {id}.')
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f'There are no flights to {destination_country}')
+            raise ObjectDoesNotExist(f'There are no flights to {destination_country.name}.')
         
+
     @staticmethod
     def get_flights_by_departure_date(date):
         """ get all the flights that departure at a searched date """
         try:
             flights = Flight.objects.filter(departure_time=date)
-            if not flights:
-                raise ObjectDoesNotExist(f'There are no flights in {date}')
+            if not flights.exists():
+                raise ObjectDoesNotExist(f'There are no flights on {date}.')
             return flights
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f'There are no flights in {date}')
+            raise ObjectDoesNotExist(f'There are no flights on {date}.')
         
 
     @staticmethod
@@ -147,11 +170,11 @@ class DAL:
         """ get all the flights that landing at a searched date """
         try:
             flights = Flight.objects.filter(landing_time=date)
-            if not flights:
-                raise ObjectDoesNotExist(f'There are no flights landing in {date}')
+            if not flights.exists():
+                raise ObjectDoesNotExist(f'There are no flights landing on {date}.')
             return flights
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f'There are no flights landing in {date}')
+            raise ObjectDoesNotExist(f'There are no flights landing on {date}.')
         
     
     @staticmethod
@@ -159,13 +182,11 @@ class DAL:
         try:
             tickets = Ticket.objects.filter(customer=customer)
             if not tickets.exists():
-                raise ObjectDoesNotExist
+                raise ObjectDoesNotExist(f"{customer.first_name} hasn't booked any flights.")
             flights = [ticket.flight for ticket in tickets]
-            if not flights:
-                raise ObjectDoesNotExist
             return flights
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f"{customer.first_name} hasn't booked any flight")
+            raise ObjectDoesNotExist(f"{customer.first_name} hasn't booked any flights.")
         
 
     @staticmethod
@@ -173,65 +194,110 @@ class DAL:
         try:
             tickets = Ticket.objects.filter(flight=flight_id)
             if tickets.exists():
-                raise ObjectDoesNotExist('Flight have not soled any tickets')
+                raise ObjectDoesNotExist('Flight has not sold any tickets')
             return tickets
         except ObjectDoesNotExist:
-                raise ObjectDoesNotExist('Flight have not soled any tickets')
+                raise ObjectDoesNotExist('Flight has not sold any tickets')
 
 
     #@@@@@@@@@@@@@@@@@@@@@ MODEL'S METHODS @@@@@@@@@@@@@@@@@@@@@#
 
     @staticmethod
     def get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None):
-        return Flight.get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None)
+        try:
+            flights = Flight.get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None)
+            if not flights.exists():
+                raise ObjectDoesNotExist('No flights found with the specified parameters.')
+            return flights
+        except Flight.DoesNotExist:
+            raise ObjectDoesNotExist('No flights found with the specified parameters.')
 
 
     @staticmethod
     def get_airlines_by_parameters(name=None, country_id=None):
-        return AirlineCompany.get_airlines_by_parameters(name=None, country_id=None)
-
+        try:
+            airlines = AirlineCompany.get_airlines_by_parameters(name, country_id)
+            if not airlines.exists():
+                raise ObjectDoesNotExist('No airlines found with the specified parameters.')
+            return airlines
+        except AirlineCompany.DoesNotExist:
+            raise ObjectDoesNotExist('No airlines found with the specified parameters.')
 
     @staticmethod
     def get_flights_by_airline_id(airline_id):
         try:
             flights = Flight.get_flights_by_airline_id(airline_id)
             if not flights.exists():
-                raise ObjectDoesNotExist('This airline has no flights')
+                raise ObjectDoesNotExist('This airline has no flights.')
             return flights
-        except ObjectDoesNotExist:
-                raise ObjectDoesNotExist('This airline has no flights')
+        except Flight.DoesNotExist:
+                raise ObjectDoesNotExist('This airline has no flights.')
             
 
     @staticmethod
     def get_arrival_flights(country_id):
-        return Flight.get_arrival_flights(country_id)
+        try:
+            flights = Flight.get_arrival_flights(country_id)
+            if not flights.exists():
+                raise ObjectDoesNotExist('There are no flights to this country.')
+            return flights
+        except Flight.DoesNotExist:
+            raise ObjectDoesNotExist('There are no flights to this country.')
 
 
     @staticmethod
     def get_departure_flights(country_id):
-        return Flight.get_departure_flights(country_id)
+        try:
+            flights = Flight.get_departure_flights(country_id)
+            if not flights.exists():
+                raise ObjectDoesNotExist('There are no flights from this country.')
+            return flights
+        except Flight.DoesNotExist:
+            raise ObjectDoesNotExist('There are no flights from this country.')
 
 
     @staticmethod
     def get_tickets_by_customer_id(customer_id):
-        return Ticket.get_tickets_by_customer_id(customer_id)
+        try:
+            tickets = Ticket.get_tickets_by_customer_id(customer_id)
+            if not tickets.exists():
+                raise ObjectDoesNotExist('Customer have no tickets.')
+            return tickets
+        except Ticket.DoesNotExist:
+            raise ObjectDoesNotExist('Customer have no tickets.')
 
 
     @staticmethod
     def get_user_by_username(username):
-        return User.get_user_by_username(username)
+        try:
+            user = User.get_user_by_username(username)
+            return user
+        except User.DoesNotExist:
+            raise ObjectDoesNotExist(f'There is no user with username: {username}.')
 
 
     @staticmethod
     def get_user_by_email(email):
-        return User.get_user_by_email(email)
+        try:
+            user = User.get_user_by_email(email)
+            return user
+        except User.DoesNotExist:
+            raise ObjectDoesNotExist(f'There is no user with email: {email}.')
 
 
     @staticmethod
     def get_customer_by_username(username):
-        return Customer.get_customer_by_username(username)
+        try:
+            customer = Customer.get_customer_by_username(username)
+            return customer
+        except Customer.DoesNotExist:
+            raise ObjectDoesNotExist(f'There is no customer with username: {username}.')
 
 
     @staticmethod
     def get_airline_by_username(username):
-        return AirlineCompany.get_airline_by_username(username)
+        try:
+            airline = AirlineCompany.get_airline_by_username(username)
+            return airline
+        except AirlineCompany.DoesNotExist:
+            raise ObjectDoesNotExist(f'There is no airline with username: {username}.')
