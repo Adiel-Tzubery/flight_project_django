@@ -91,10 +91,12 @@ class FacadsValidator:
         try: 
             username_exist = DAL.get_user_by_username(username)
             if username_exist:
-                raise Exception('username is taken, please try another one.')
+                # this wil be logger: ('username is taken, please try another one.')
+                return True
             email_exists = DAL.get_user_by_email(email)
             if email_exists.exists():
-                raise Exception('email is taken, please try another one.')
+                # this wil be logger: ('email is taken, please try another one.')
+                return True
             return False
         except Exception as e:
             raise Exception(f'Error: {str(e)}.')
@@ -106,10 +108,12 @@ class FacadsValidator:
         try:
             phone_exists = DAL.get_customer_by_phone(phone)
             if phone_exists:
-                raise Exception(f'phone number is taken, please try another one.')
+                # this wil be logger: (f'phone number is taken, please try another one.')
+                return True
             credit_exists = DAL.get_customer_by_credit(credit)
             if credit_exists:
-                raise Exception('credit number is taken, pleas try another one.')
+                # this wil be logger: ('credit number is taken, pleas try another one.')
+                return True
             return False
         except Exception as e:
             raise Exception(f'Error: {str(e)}.')
@@ -152,9 +156,9 @@ class FacadsValidator:
             if departure_time < datetime.now():
                 raise Exception('flight date cannot be in the past.')
             if remaining_tickets < 0:
-                raise Exception('minimum tickets: 0'.)
+                raise Exception('minimum tickets: 0.')
             if price < 0:
-                raise Exception('minimum price: 0$'.)
+                raise Exception('minimum price: 0$.')
             if landing_time > departure_time:
                 raise Exception('departure time must be before landing time.')
             if origin_country == destination_country:

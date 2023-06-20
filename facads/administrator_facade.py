@@ -1,7 +1,8 @@
+from dal.dal import DAL
 from .facade_base import FacadeBase, FacadsValidator
 from .anonymous_facade import AnonymousFacade
+from django.core.exceptions import ObjectDoesNotExist
 from base.models import Customer, AirlineCompany, User, Administrator
-from dal.dal import DAL
 
 
 class AdministratorFacade(FacadeBase):
@@ -11,8 +12,8 @@ class AdministratorFacade(FacadeBase):
         try:
             customers = DAL.get_all(Customer)
             return customers
-        except Exception:
-            raise Exception
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist('No customer found.')
         
 
     def add_airline(**kwargs):
@@ -21,33 +22,32 @@ class AdministratorFacade(FacadeBase):
             # check if airline already exists
             airline = AdministratorFacade.get_airline_by_parameters(name=name)
             if airline.exists():
-                raise Exception
+                raise Exception(f'There is already airline with name: {name}.')
             new_airline = DAL.create(AirlineCompany, kwargs)
             return new_airline
         except KeyError:
             raise KeyError('name not provided')
         except Exception:
-            raise Exception(f'There is already airline with name: {name}')
+            raise Exception(f'There is already airline with name: {name}.')
 
 
     def add_customer(**kwargs):
         try:
             customer = AnonymousFacade.add_customer(kwargs)
             return customer
-        except Exception:
-            raise Exception
+        except Exception as e:
+            raise Exception(f'Error: {str(e)}.')
 
 
     def add_administrator(**kwargs):
         try: # check if username and email are available.
             username = kwargs['username']
             email = kwargs['email']
-            if FacadsValidator.is_username_or_email_exists(username, email):
+            if not FacadsValidator.is_username_or_email_exists(username, email):
                 administrator = DAL.create(User, kwargs)
                 return administrator
-            raise Exception
-        except Exception:
-            raise Exception
+        except Exception as e:
+            raise Exception(f'Error: {str(e)}.')
 
 
     def remove_airline(airline_id):

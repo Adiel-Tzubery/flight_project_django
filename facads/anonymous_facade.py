@@ -15,15 +15,17 @@ class AnonymousFacade(FacadeBase, FacadsValidator):
             if not AnonymousFacade.is_username_or_email_exists(username, email):
                 user = DAL.create(User, username, email, password, **kwargs)
                 return user
-        except Exception:
-            raise Exception
+        except Exception as e:
+            raise Exception(f'Error: {str(e)}.')
 
 
     def add_customer(first_name, last_name, credit_card_no, phone_no, address, username, email, password):
         try:
             user = AnonymousFacade.create_new_user(username, email, password)
             if not AnonymousFacade.is_phone_or_credit_exists(phone_no, credit_card_no):
-                customer = AnonymousFacade.create_new_user(first_name, last_name, credit_card_no, phone_no, address, user)
+                customer = DAL.create(Customer, first_name=first_name, last_name=last_name,
+                                        credit_card_no=credit_card_no, phone_no=phone_no,
+                                        address=address, user=user)
                 return customer
-        except Exception:
-            raise Exception
+        except Exception as e:
+            raise Exception(f'Error: {str(e)}.')
