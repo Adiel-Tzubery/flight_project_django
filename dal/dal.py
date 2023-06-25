@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from base.models import AirlineCompany, Flight, Customer, Ticket, User, Country
+from base.models import AirlineCompany, Flight, Customer, Ticket, User, Country, UserRole
 
 
 
@@ -42,8 +42,12 @@ class DAL:
                 obj = model.objects.create_superuser(**kwargs)
             elif 'customer' in kwargs.values() or 'airline company' in kwargs.values():
                 obj = model.objects.create_user(**kwargs)
+                obj.user_role = UserRole.objects.get(role_name='customer')
+                obj.save()
             else:
                 obj = model.objects.create(**kwargs)
+                obj.user_role = UserRole.objects.get(role_name='customer')
+                obj.save()
             return obj
         except Exception as e:
             raise Exception(f'Error occurred while creating instance of model: {model.__name__}, error: {str(e)}.')
@@ -72,7 +76,7 @@ class DAL:
         except model.DoesNotExist:
             raise ObjectDoesNotExist(f'No {model.__name__} found with id {id}.')
         except Exception as e:
-            raise Exception(f'Error updating {model.__name__}, error: {str(e)}.')
+            raise Exception(f'Error while updating {model.__name__}, error: {str(e)}.')
 
 
     @staticmethod

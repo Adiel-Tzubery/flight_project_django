@@ -1,9 +1,13 @@
 from facads.customer_facade import CustomerFacade
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from auth.auth import group_required
+from django.contrib.auth.decorators import login_required
 from base.serializers import CustomerModelSerializer, TicketModelSerializer
 
 
+@login_required
+@group_required('customer')
 @api_view(['POST'])
 def update_customer(customer_id, **kwargs):
     try:
@@ -14,6 +18,8 @@ def update_customer(customer_id, **kwargs):
         raise Exception
     
 
+@login_required
+@group_required('customer')
 @api_view(['POST'])
 def add_ticket(customer_id, flight_id):
     try:
@@ -24,6 +30,8 @@ def add_ticket(customer_id, flight_id):
         raise Exception
     
 
+@login_required
+@group_required('customer')
 @api_view(['DELETE'])
 def remove_ticket(ticket_id):
     try:
@@ -34,6 +42,8 @@ def remove_ticket(ticket_id):
         return Response({'message': 'Ticket cannot be deleted.'}, status=409)
 
 
+@login_required
+@group_required('customer')
 @api_view(['GET'])
 def get_my_tickets(customer_id):
     try:

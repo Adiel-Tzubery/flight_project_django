@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.db.models import Q
 
-# Create your models here.
+
 class Country(models.Model):
     name = models.CharField(max_length=30, unique=True)
     flag = models.ImageField(null=True, blank=True, default='defaults/default_flag_piq.png', upload_to='countries/')
@@ -124,7 +124,7 @@ class UserRole(models.Model):
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, username, email, password, user_role, **kwargs):
+    def create_user(self, username, email, password, **kwargs):
         if not username:
             raise ValueError('The username field must be set')
         if not email:
@@ -132,8 +132,7 @@ class CustomUserManager(BaseUserManager):
         if not password:
             raise ValueError('The password field must be set')
         email = self.normalize_email(email)
-        role = UserRole.objects.get(role_name=user_role)
-        user = self.model(username=username, email=email, user_role=role, **kwargs)
+        user = self.model(username=username, email=email, **kwargs)
         user.set_password(password)
         user.save(using=self._db)
         return user

@@ -1,10 +1,12 @@
 from facads.facade_base import FacadeBase
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.contrib.auth.decorators import login_required
 from base.serializers import FlightModelSerializer, AirlineCompanyModelSerializer, CountryModelSerializer
 
 
 
+@login_required
 @api_view(['GET'])
 def get_all_flights(request):
     try:
@@ -12,9 +14,10 @@ def get_all_flights(request):
         serializer = FlightModelSerializer(flights, many=True)
         return Response(serializer.data)
     except Exception:
-        raise Exception
+        return Response('There is no flights')
 
 
+@login_required
 @api_view(['GET'])
 def get_flight_by_id(request, flight_id):
     try:
@@ -25,6 +28,7 @@ def get_flight_by_id(request, flight_id):
         raise Exception
 
 
+@login_required
 @api_view(['GET'])
 def get_flights_by_parameters(request, origin_country_id=None, destination_country_id=None, date=None):
     try:
@@ -37,6 +41,7 @@ def get_flights_by_parameters(request, origin_country_id=None, destination_count
         raise Exception
 
 
+@login_required
 @api_view(['GET'])
 def get_all_airlines(request):
     try:
@@ -47,6 +52,7 @@ def get_all_airlines(request):
         raise Exception
 
 
+@login_required
 @api_view(['GET'])
 def get_airline_by_id(request, airline_id):
     try:
@@ -57,6 +63,7 @@ def get_airline_by_id(request, airline_id):
         raise Exception
 
 
+@login_required
 @api_view(['GET'])
 def get_airlines_by_parameters(request, name=None, country_id=None):
     try:
@@ -67,6 +74,7 @@ def get_airlines_by_parameters(request, name=None, country_id=None):
         raise Exception
 
 
+@login_required
 @api_view(['GET'])
 def get_all_countries(request):
     try:
@@ -76,7 +84,7 @@ def get_all_countries(request):
     except Exception:
         raise Exception
 
-
+@login_required
 @api_view(['GET'])
 def get_country_by_id(request, country_id):
     try:

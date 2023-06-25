@@ -1,11 +1,20 @@
 from facads.anonymous_facade import AnonymousFacade
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 from base.serializers import UserModelSerializer, CustomerModelSerializer
+from django.core.exceptions import PermissionDenied, ValidationError
 
 
-def log_in(request):
-    pass
+def log_in(request, username, password):
+    try:
+        user = AnonymousFacade.log_in(request, username, password)
+        serializer = UserModelSerializer(user, many=False)
+        return Response(serializer.data)
+    except (PermissionDenied, ValidationError):
+        return Response({"error": "An error occurred during login."}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception:
+        return Response({"error": "An unexpected error occurred during login."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])

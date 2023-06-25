@@ -1,20 +1,26 @@
 from facads.administrator_facade import AdministratorFacade
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.contrib.auth.decorators import login_required
+from auth.auth import group_required
 from base.serializers import CustomerModelSerializer, AirlineCompanyModelSerializer, AdministratorModelSerializer
 
 
 
+@login_required
+@group_required('administrator')
 @api_view(['GET'])
 def get_all_customers(request):
     try:
-        customers = AdministratorFacade.get_all_customers(request)
+        customers = AdministratorFacade.get_all_customers()
         serializer = CustomerModelSerializer(customers, many=True)
         return Response(serializer.data)
     except Exception:
         raise Exception
 
 
+@login_required
+@group_required('administrator')
 @api_view(['POST'])
 def add_airline(request, **kwargs):
     try:
@@ -25,6 +31,8 @@ def add_airline(request, **kwargs):
         raise Exception
 
 
+@login_required
+@group_required('administrator')
 @api_view(['POST'])
 def add_customer(request, **kwargs):
     try:
@@ -35,16 +43,21 @@ def add_customer(request, **kwargs):
         raise Exception
 
 
+@login_required
+@group_required('administrator')
 @api_view(['POST'])
 def add_administrator(request, **kwargs):
     try:
         administrator = AdministratorFacade.add_administrator(kwargs)
         serializer = AdministratorModelSerializer(administrator, many=False)
         return Response(serializer.data)
+    
     except Exception:
         raise Exception
 
 
+@login_required
+@group_required('administrator')
 @api_view(['DELETE'])
 def remove_airline(request, airline_id):
     try:
@@ -55,6 +68,8 @@ def remove_airline(request, airline_id):
         return Response({'message': 'Airline cannot be deleted.'}, status=409)
 
 
+@login_required
+@group_required('administrator')
 @api_view(['DELETE'])
 def remove_customer(request, customer_id):
     try:
@@ -65,7 +80,8 @@ def remove_customer(request, customer_id):
         return Response({'message': 'Customer cannot be deleted.'}, status=409)
 
 
-
+@login_required
+@group_required('administrator')
 @api_view(['DELETE'])
 def remove_administrator(request, administrator_id):
     try:

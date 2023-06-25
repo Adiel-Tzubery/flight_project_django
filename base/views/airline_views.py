@@ -1,9 +1,13 @@
 from facads.airline_facade import AirlineFacade
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from auth.auth import group_required
+from django.contrib.auth.decorators import login_required
 from base.serializers import AirlineCompanyModelSerializer, FlightModelSerializer
 
 
+@login_required
+@group_required('airline company')
 @api_view(['POST'])
 def update_airline(airline_id, **kwargs):
     try:
@@ -14,6 +18,8 @@ def update_airline(airline_id, **kwargs):
         raise Exception
     
 
+@login_required
+@group_required('airline company')
 @api_view(['POST'])
 def add_flight(**kwargs):
     try:
@@ -24,6 +30,8 @@ def add_flight(**kwargs):
         raise Exception
     
 
+@login_required
+@group_required('airline company')
 @api_view(['POST'])
 def update_flight(flight_id, **kwargs):
     try:
@@ -34,6 +42,8 @@ def update_flight(flight_id, **kwargs):
         raise Exception
     
 
+@login_required
+@group_required('airline company')
 @api_view(['DELETE'])
 def remove_flight(flight_id):
     try:
@@ -44,6 +54,8 @@ def remove_flight(flight_id):
         return Response({'message': 'Flight cannot be deleted.'}, status=409)
     
 
+@login_required
+@group_required('airline company')
 @api_view(['GET'])
 def get_my_flight(airline_id):
     try:

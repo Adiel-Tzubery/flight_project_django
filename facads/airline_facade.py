@@ -11,8 +11,8 @@ class AirlineFacade(FacadeBase):
         try:
             flight = DAL.update(AirlineCompany, airline_id, kwargs)
             return flight
-        except Exception:
-            raise Exception
+        except Exception as e:
+            raise Exception(f'{str(e)}')
 
 
     def add_flight(**kwargs):
@@ -20,8 +20,8 @@ class AirlineFacade(FacadeBase):
             if FacadsValidator.is_flight_valid(kwargs):
                 flight = DAL.create(Flight, kwargs)
                 return flight
-        except Exception:
-            raise Exception
+        except Exception as e:
+            raise Exception(f'{str(e)}')
 
 
     def update_flight(flight_id, **kwargs):
@@ -45,25 +45,25 @@ class AirlineFacade(FacadeBase):
                                             remaining_tickets=remaining_tickets,
                                             price=price)
                 return updated_flight
-        except Exception:
-            raise Exception
+        except Exception as e:
+            raise Exception(f'{str(e)}')
             
 
     def remove_flight(flight_id):
-        try: # check if flight soled any tickets.
+        try: # have flight soled any tickets.
             tickets = DAL.get_tickets_by_flight_id(flight_id)
             if tickets.exists(): 
                 raise Exception('This flight have sold Tickets: cannot be deleted')
             deleted_flight = DAL.remove(Flight, flight_id)
             return deleted_flight
             # return something
-        except Exception:
-            raise ('This flight have sold Tickets: cannot be deleted')
+        except Exception as e:
+            raise Exception(f'{str(e)}')
 
 
     def get_my_flights(airline_id):
         try:
             flights = DAL.get_flights_by_airline_id(airline_id=airline_id)
             return flights
-        except ObjectDoesNotExist:
-            raise ObjectDoesNotExist('This airline has no flights')
+        except ObjectDoesNotExist as e:
+            raise ObjectDoesNotExist(f'Error: {str(e)}')
