@@ -1,13 +1,13 @@
 from facads.administrator_facade import AdministratorFacade
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.contrib.auth.decorators import login_required
 from auth.auth import group_required
 from base.serializers import CustomerModelSerializer, AirlineCompanyModelSerializer, AdministratorModelSerializer
 
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('administrator')
 @api_view(['GET'])
 def get_all_customers(request):
@@ -19,7 +19,7 @@ def get_all_customers(request):
         raise Exception
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('administrator')
 @api_view(['POST'])
 def add_airline(request, **kwargs):
@@ -31,7 +31,7 @@ def add_airline(request, **kwargs):
         raise Exception
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('administrator')
 @api_view(['POST'])
 def add_customer(request, **kwargs):
@@ -43,7 +43,7 @@ def add_customer(request, **kwargs):
         raise Exception
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('administrator')
 @api_view(['POST'])
 def add_administrator(request, **kwargs):
@@ -56,7 +56,7 @@ def add_administrator(request, **kwargs):
         raise Exception
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('administrator')
 @api_view(['DELETE'])
 def remove_airline(request, airline_id):
@@ -68,7 +68,7 @@ def remove_airline(request, airline_id):
         return Response({'message': 'Airline cannot be deleted.'}, status=409)
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('administrator')
 @api_view(['DELETE'])
 def remove_customer(request, customer_id):
@@ -80,7 +80,7 @@ def remove_customer(request, customer_id):
         return Response({'message': 'Customer cannot be deleted.'}, status=409)
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('administrator')
 @api_view(['DELETE'])
 def remove_administrator(request, administrator_id):

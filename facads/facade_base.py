@@ -1,9 +1,10 @@
 from base.models import *
 from dal.dal import DAL
 from datetime import datetime
+from django.contrib.auth import logout
 from django.core.exceptions import ObjectDoesNotExist
 
-
+#@@@@@@@@@@@@@@@@@@@@@@@@@ DON'T FORGET THE USER UPDATE METHOD, + ADD ONE TO ADMINISTRATOR @@@@@@@@@@@@@@@@@@@@@@@@@
 class FacadeBase:
     
     @staticmethod
@@ -79,8 +80,8 @@ class FacadeBase:
 
 
     @staticmethod
-    def log_out():
-        pass
+    def log_out(request):
+        logout(request)
 
 
 class FacadsValidator:
@@ -166,3 +167,7 @@ class FacadsValidator:
             return True
         except Exception as e:
             raise Exception(f'Error: {str(e)}.')
+        
+    @staticmethod
+    def log_out(user):
+        pass

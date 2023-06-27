@@ -8,18 +8,18 @@ from base.models import User, Customer
 
 class AnonymousFacade(FacadeBase, FacadsValidator):
 
-    def log_in(request, username, password):
-        try:
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return user
-            
-                raise PermissionDenied(f"Username and password don't match.")
-        except (PermissionDenied, ValidationError) as e:
-            raise PermissionDenied("Invalid username or password") from e
-        except Exception as e:
-            raise Exception(f"Error: {str(e)}")
+    # def log_in(request, username, password):
+    #     try:
+    #         user = authenticate(request, username=username, password=password)
+    #         if user is not None:
+    #             login(request, user)
+    #             return user
+    #         else:
+    #             raise PermissionDenied(f"Username and password don't match.")
+    #     except (PermissionDenied, ValidationError) as e:
+    #         raise PermissionDenied("Invalid username or password") from e
+    #     except Exception as e:
+    #         raise Exception(f"Error: {str(e)}")
 
 
     def create_new_user(username, email, password, **kwargs):

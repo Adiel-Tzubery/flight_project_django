@@ -1,12 +1,16 @@
 from facads.facade_base import FacadeBase
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
 from rest_framework.response import Response
-from django.contrib.auth.decorators import login_required
+from rest_framework_simplejwt.tokens import RefreshToken
 from base.serializers import FlightModelSerializer, AirlineCompanyModelSerializer, CountryModelSerializer
 
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_all_flights(request):
     try:
@@ -14,10 +18,11 @@ def get_all_flights(request):
         serializer = FlightModelSerializer(flights, many=True)
         return Response(serializer.data)
     except Exception:
-        return Response('There is no flights')
+        return Response({'message': 'There are no flights'}, status=status.HTTP_404_NOT_FOUND)
 
 
-@login_required
+
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_flight_by_id(request, flight_id):
     try:
@@ -28,7 +33,7 @@ def get_flight_by_id(request, flight_id):
         raise Exception
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_flights_by_parameters(request, origin_country_id=None, destination_country_id=None, date=None):
     try:
@@ -41,7 +46,7 @@ def get_flights_by_parameters(request, origin_country_id=None, destination_count
         raise Exception
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_all_airlines(request):
     try:
@@ -52,7 +57,7 @@ def get_all_airlines(request):
         raise Exception
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_airline_by_id(request, airline_id):
     try:
@@ -63,7 +68,7 @@ def get_airline_by_id(request, airline_id):
         raise Exception
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_airlines_by_parameters(request, name=None, country_id=None):
     try:
@@ -74,7 +79,7 @@ def get_airlines_by_parameters(request, name=None, country_id=None):
         raise Exception
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_all_countries(request):
     try:
@@ -84,7 +89,7 @@ def get_all_countries(request):
     except Exception:
         raise Exception
 
-@login_required
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_country_by_id(request, country_id):
     try:
@@ -93,3 +98,15 @@ def get_country_by_id(request, country_id):
         return Response(serializer.data)
     except Exception:
         raise Exception
+    
+
+@csrf_exempt
+@api_view(['POST'])
+def log_out(request):
+    try:
+        refresh_token = request.data['refresh_token']
+        OutstandingToken.objects.filter(token=refresh_token).delete()
+        return Response(status=status.HTTP_205_RESET_CONTENT)
+    except Exception as e:
+        raise Exception(f'{str(e)}')
+        # return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

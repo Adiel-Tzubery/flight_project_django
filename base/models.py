@@ -5,6 +5,10 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db.models import Q
 
 
+# this file contain the flight management system's models. some of the models have method/s in here.
+
+
+
 class Country(models.Model):
     name = models.CharField(max_length=30, unique=True)
     flag = models.ImageField(null=True, blank=True, default='defaults/default_flag_piq.png', upload_to='countries/')
@@ -22,15 +26,14 @@ class Flight(models.Model):
 
     def clean(self):
         if self.departure_time >= self.landing_time:
-            raise ValidationError('Landing time must be after the departure time')
+            raise ValidationError('Landing time must be after the departure time.')
     
 
     @staticmethod
     def get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None):
-        """ method that get's all the flights according to parameters if there is any,
-            if there isn't, the method will return all the flights, if there is any. """
+        """ return list of all the flights or reduce it according to conditions, if there is any. """
 
-        # inserting all the existing conditions to a q
+        # inserting all the existing conditions to a q.
         filter_conditions = Q()
 
         if origin_country_id is not None:
@@ -40,19 +43,19 @@ class Flight(models.Model):
         if date is not None:
             filter_conditions &= Q(departure_time__date=date)
 
-        if not filter_conditions: # if there are no conditions
+        if not filter_conditions: # if there are no conditions.
             try:
                 flights = Flight.objects.all()
-                if not flights.exists():
+                if not flights.exists(): # if there are no flights.
                     raise ObjectDoesNotExist
                 return flights
             except ObjectDoesNotExist:
                 raise ObjectDoesNotExist('There are no flights.')
             
-        # applying the conditions
+        # applying the conditions.
         try:
             flights = Flight.objects.filter(filter_conditions)
-            if not flights.exists():
+            if not flights.exists(): # if there are no flights.
                 raise ObjectDoesNotExist
             return flights
         except ObjectDoesNotExist:
@@ -61,36 +64,42 @@ class Flight(models.Model):
 
     @staticmethod
     def get_flights_by_airline_id(airline_id):
-        try:
+        """ return all flights of specific airline according to it's id. """
+        
+        try: # get and return the flights.
             flights = Flight.objects.filter(airline_company_id=airline_id)
-            if not flights.exists():
-                raise ObjectDoesNotExist
+            if not flights.exists(): # if there are no flights.
+                raise ObjectDoesNotExist 
             else:
                 return flights
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(f'There are no flights from airline {airline_id}')
+            raise ObjectDoesNotExist(f'There are no flights from airline {airline_id}.')
         
 
     @staticmethod
     def get_arrival_flights(country_id):
-        try:
+        """ return list of all flights that are arriving in the next 12 hours to specific country. """
+
+        try: # get and return the flights.
             flights = Flight.objects.filter(destination_country_id=country_id, landing_time__gte=datetime.now(), landing_time__lte=datetime.now()+timedelta(hours=12))
-            if not flights.exists():
+            if not flights.exists(): # if there are no flights.
                 raise ObjectDoesNotExist
             return flights
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist('No arriving flights in the next 12 hours')
+            raise ObjectDoesNotExist('No arriving flights in the next 12 hours.')
         
 
     @staticmethod
     def get_departure_flights(country_id):
+        """ return list of all the flights that are departure in the next 12 hours from specific country. """
+
         try:
             flights = Flight.objects.filter(origin_country_id=country_id, departure_time__gte=datetime.now(), departure_time__lte=datetime.now()+timedelta(hours=12))
-            if not flights.exists():
+            if not flights.exists(): # if there are no flights.
                 raise ObjectDoesNotExist
             return flights
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist('No departing flight in the next 12 hours')
+            raise ObjectDoesNotExist('No departing flight in the next 12 hours.')
 
 
 class Ticket(models.Model):
@@ -103,19 +112,20 @@ class Ticket(models.Model):
 
     @staticmethod
     def get_tickets_by_customer_id(customer_id):
-        #getting the customer object if exists
-        try:
+        """ return list of all the customer's tickets. """
+
+        try: # getting the customer.
             customer = Customer.objects.get(pk=customer_id)
-        except Customer.DoesNotExist:
+        except Customer.DoesNotExist: # if customer does not exist in the system.
             raise ObjectDoesNotExist(f'No customer found with ID {customer_id}')
-        #getting the tickets, if there are any
-        try:
+        
+        try: # get and return the tickets list.
             tickets = Ticket.objects.filter(customer=customer)
-            if not tickets:
+            if not tickets.exists(): # if there are no tickets.
                 raise Ticket.DoesNotExist
             return tickets
         except Ticket.DoesNotExist:
-            raise ObjectDoesNotExist(f'No tickets found for customer')
+            raise ObjectDoesNotExist(f'No tickets found for customer.')
 
 
 class UserRole(models.Model):
@@ -161,18 +171,23 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @staticmethod
     def get_user_by_username(username):
+        """ return user according to it's username. """
+
         try:
-            return User.objects.get(username=username)
-        except ObjectDoesNotExist:
+            user = User.objects.get(username=username)
+            return user
+        except User.DoesNotExist: # if user does not exist.
             raise ObjectDoesNotExist(f'No user found with username: {username}')
         
 
     @staticmethod
     def get_user_by_email(email):
+        """ return user according to it's email. """
+
         try:
             user = User.objects.filter(email=email).first()
-            if not user:
-                raise ObjectDoesNotExist(f'No user found with email: {email}.')
+            if not user: # if user does not exist.
+                raise User.DoesNotExist
             return user
         except User.DoesNotExist:
             raise  ObjectDoesNotExist(f'No user found with email: {email}.')
@@ -195,10 +210,12 @@ class Customer(models.Model):
 
     @staticmethod
     def get_customer_by_username(username):
+        """ return customer according to it's user's username. """
+
         try:
             customer = Customer.objects.select_related('user').get(user__username=username)
             return customer
-        except Customer.DoesNotExist:
+        except Customer.DoesNotExist: # if customer does not exists.
             raise ObjectDoesNotExist(f'Customer with username {username} does not exist.')
 
 
@@ -209,17 +226,18 @@ class AirlineCompany(models.Model):
 
     @staticmethod
     def get_airline_by_username(username):
+        """ return airline according to it's user's username. """
+
         try:
             airline = AirlineCompany.objects.select_related('user').get(user__username=username)
             return airline
-        except AirlineCompany.DoesNotExist:
+        except AirlineCompany.DoesNotExist: # if airline does not exists.
             raise ObjectDoesNotExist(f'Airline with username {username} does not exist.')
 
 
     @staticmethod
     def get_airlines_by_parameters(name=None, country_id=None):
-        """ method that get's all the airlines according to parameters if there is any,
-            if there isn't, the method will return all the airlines, if there is any. """
+        """ return list of all the airlines or reduce it according to conditions, if there is any. """
         
         # inserting all the existing conditions to a q
         filter_conditions = Q()
@@ -233,7 +251,7 @@ class AirlineCompany(models.Model):
         if not filter_conditions:
             try:
                 airlines = AirlineCompany.objects.all()
-                if not airlines.exists():
+                if not airlines.exists(): # if there are no airlines.
                     raise ObjectDoesNotExist
             except ObjectDoesNotExist:
                 raise ObjectDoesNotExist('There are no airlines')
@@ -241,7 +259,7 @@ class AirlineCompany(models.Model):
         # applying the conditions
         try:
             airlines = AirlineCompany.objects.filter(filter_conditions)
-            if not airlines.exists():
+            if not airlines.exists(): # if there are no airlines.
                 raise ObjectDoesNotExist
             return airlines
         except ObjectDoesNotExist:

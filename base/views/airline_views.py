@@ -1,15 +1,15 @@
 from facads.airline_facade import AirlineFacade
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from auth.auth import group_required
-from django.contrib.auth.decorators import login_required
 from base.serializers import AirlineCompanyModelSerializer, FlightModelSerializer
 
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('airline company')
 @api_view(['POST'])
-def update_airline(airline_id, **kwargs):
+def update_airline(request, airline_id, **kwargs):
     try:
         updated_airline = AirlineFacade.update_airline(airline_id, kwargs)
         serializer = AirlineCompanyModelSerializer(updated_airline, many=False)
@@ -18,10 +18,10 @@ def update_airline(airline_id, **kwargs):
         raise Exception
     
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('airline company')
 @api_view(['POST'])
-def add_flight(**kwargs):
+def add_flight(request, **kwargs):
     try:
         flight = AirlineFacade.add_flight(kwargs)
         serializer = FlightModelSerializer(flight, many=False)
@@ -30,10 +30,10 @@ def add_flight(**kwargs):
         raise Exception
     
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('airline company')
 @api_view(['POST'])
-def update_flight(flight_id, **kwargs):
+def update_flight(request, flight_id, **kwargs):
     try:
         updated_flight = AirlineFacade.update_flight(flight_id, kwargs)
         serializer = FlightModelSerializer(updated_flight, many=False)
@@ -42,10 +42,10 @@ def update_flight(flight_id, **kwargs):
         raise Exception
     
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('airline company')
 @api_view(['DELETE'])
-def remove_flight(flight_id):
+def remove_flight(request, flight_id):
     try:
         deleted_flight = AirlineFacade.remove_flight(flight_id)
         if deleted_flight:
@@ -54,10 +54,10 @@ def remove_flight(flight_id):
         return Response({'message': 'Flight cannot be deleted.'}, status=409)
     
 
-@login_required
+@permission_classes([IsAuthenticated])
 @group_required('airline company')
 @api_view(['GET'])
-def get_my_flight(airline_id):
+def get_my_flight(request, airline_id):
     try:
         flights = AirlineFacade.get_my_flights(airline_id)
         serializer = FlightModelSerializer(flights, many=False)
