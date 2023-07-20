@@ -23,17 +23,18 @@ class DalAddTests(TestCase):
         self.destination_country = Country.objects.create(name='yemen')
 
         # airline
-        self.user = User.objects.create(username='Ben-Guryon', password='password', email='bg@gmail.com', user_role=self.airline_role)
+        self.user = User.objects.create(username='Ben-Guryon', email='bg@gmail.com', password='password')
         self.country = Country.objects.create(name='Israel')
-        self.airline_company = AirlineCompany.objects.create(name='Ben Guryon Airline', country=self.country, user=self.user)
+        self.airline_company = DAL.create(AirlineCompany, name='Ben Guryon Airline', country=self.country, user=self.user, user_role=self.airline_role)
 
         # customer
-        self.user = User.objects.create_user(username='adieltzu', password='password', email='shalom@gmail.com', user_role='customer')
-        self.customer = Customer.objects.create(first_name='Adiel',
+        self.user = User.objects.create_user(username='adieltzu', email='shalom@gmail.com', password='password')
+        self.customer = DAL.create(Customer,first_name='Adiel',
                                                 last_name='Tzubery',
                                                 phone_no='056-9856925',
                                                 credit_card_no='0452-0527-9856-9874',
-                                                user=self.user)
+                                                user=self.user,
+                                                user_role=self.customer_role)
         
         # flight
         airline_company = self.airline_company
@@ -74,13 +75,13 @@ class DalAddTests(TestCase):
         email = 'email@email.com'
         password = 'password'
         user_role = 'customer'
-        user = DAL.create(User, username=username, email=email, password=password, user_role=user_role)
+        user = DAL.create(User, username=username, email=email, password=password)
         first_name = 'Nave'
         last_name = 'Alon'
         credit_card_no = '5555-5555-5555-5555'
         phone_no = '054-5423-2343'
         address = 'kfar hasidim'
-        customer = DAL.create(Customer,first_name=first_name, last_name=last_name, credit_card_no=credit_card_no, phone_no=phone_no, address=address, user=user)
+        customer = DAL.create(Customer,first_name=first_name, last_name=last_name, credit_card_no=credit_card_no, phone_no=phone_no, address=address, user_role=user_role, user=user)
         expected_customer = DAL.get_customer_by_username(username)
         self.assertEqual(expected_customer, customer)
 
@@ -90,7 +91,7 @@ class DalAddTests(TestCase):
         email = 'admin@mail.com'
         password = 'password'
         user_role = 'administrator'
-        user = DAL.create(User,username=username, email=email, password=password, user_role=user_role)
+        user = DAL.create(User,username=username, email=email, password=password,)
         first_name = 'add'
         last_name = 'min'
         administrator = DAL.create(Administrator, first_name=first_name, last_name=last_name, user=user)
@@ -104,9 +105,9 @@ class DalAddTests(TestCase):
         email = 'air@line.com'
         password = 'password'
         user_role = 'airline company'
-        user = DAL.create(User, username=username, email=email, password=password, user_role=user_role)
+        user = DAL.create(User, username=username, email=email, password=password)
         name = 'spainaire'
-        airline = DAL.create(AirlineCompany, name=name, country=self.airline_country, user=user)
+        airline = DAL.create(AirlineCompany, name=name, country=self.airline_country, user=user, user_role=user_role)
         expected_airline = DAL.get_airline_by_username(username)
         self.assertEqual(expected_airline, airline)
 

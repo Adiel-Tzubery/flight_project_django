@@ -39,7 +39,7 @@ class DAL:
     
 
     @staticmethod
-    def create(model,**kwargs):
+    def create(model, **kwargs):
         """ create and return a new instance of a requested model. """
 
         try: # if instance is user/superuser/other, preform different creation method. 
@@ -47,9 +47,6 @@ class DAL:
                 obj = model.objects.create_superuser(**kwargs)
             elif 'customer' in kwargs.values() or 'airline company' in kwargs.values():
                 obj = model.objects.create_user(**kwargs)
-                role_name=kwargs['role_name']
-                obj.user_role = UserRole.objects.get(role_name=role_name)
-                obj.save() # if user is not superuser, saving the instance after assign user_role.
             else:
                 obj = model.objects.create(**kwargs)
                 obj.save() # saving the instance.
@@ -72,6 +69,8 @@ class DAL:
     @staticmethod
     def update(model, id, **kwargs):
         """ update and return an instance of a requested model. """
+
+        # @@@@@@@@@ handle case of kwargs comes with keys with empty values. @@@@@@@@@ 
 
         try:
             instance = DAL.get_by_id(model, id)
@@ -100,6 +99,7 @@ class DAL:
         except model.DoesNotExist: # if instance does not exists before deleting.
             raise ObjectDoesNotExist(f'No {model.__name__} found with id {id}.')
     
+    #------------------------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
     def get_customer_by_phone(phone_no):
@@ -353,3 +353,14 @@ class DAL:
             return airline
         except AirlineCompany.DoesNotExist: # if airline does not exists.
             raise ObjectDoesNotExist(f'There is no airline with username: {username}.')
+        
+    
+    @staticmethod
+    def get_airline_by_name(name):
+        """ return airline according to it's name. """
+
+        try:
+            airline = AirlineCompany.get_airline_by_name(name)
+            return airline
+        except AirlineCompany.DoesNotExist:
+            raise ObjectDoesNotExist(f'Airline with name {name} does not exists.')

@@ -21,9 +21,16 @@ class CountryModelSerializer(serializers.ModelSerializer):
 
 
 class UserModelSerializer(serializers.ModelSerializer):
+    role_name = serializers.CharField(source='get_user_role_name')
+
     class Meta:
         model = User
-        fields = '__all__'
+        fields = [
+            'id',
+            'email',
+            'username',
+            'role_name'
+        ]
 
 
 class CustomerModelSerializer(serializers.ModelSerializer):

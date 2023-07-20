@@ -17,9 +17,11 @@ urlpatterns = [
 
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('auth/logout/', base_views.log_out, name='log-out'),
+    path('auth/logout/', base_views.log_out, name='log-out'), # logout - located at base views, count as auth view.
 
     # Base views
+
+    path('base/user_data/', base_views.get_user_data, name='user_data'),
 
     path('base/all-flights/', base_views.get_all_flights, name='all-flights'),
     path('base/flight/<int:id>/', base_views.get_flight_by_id, name='flight'),
@@ -29,7 +31,7 @@ urlpatterns = [
     path('base/airline/<int:id>/', base_views.get_airline_by_id, name='airline'),
     path('base/airlines-by-parameters/', base_views.get_airlines_by_parameters, name='airlines-by-parameter'),
 
-    path('base/countries/', base_views.get_all_countries, name='countries'),
+    path('base/all-countries/', base_views.get_all_countries, name='countries'),
     path('base/country/<int:id>/', base_views.get_country_by_id, name='country'),
 
     # Administrator views
@@ -46,7 +48,10 @@ urlpatterns = [
 
     # Anonymous views
 
-    # path('ano/login/', anonymous_views.log_in, name='login'),
+    # logout - located at base views, count as auth view. (line 20, this file.)
+
+    # create_new_user does not need direct link to the FA.
+    # it's been called from create_customer/airline/administrator methods(facades) directly. 
     path('ano/create-user/', anonymous_views.create_new_user, name='create-user'),
     path('ano/add-customer/', anonymous_views.add_customer, name='add-customer'),
 
@@ -56,7 +61,7 @@ urlpatterns = [
     path('airline/add-flight/', airline_views.add_flight, name='add-flight'),
     path('airline/update-flight/<int:id>/', airline_views.update_flight, name='update=flight'),
     path('airline/remove-flight/<int:id>/', airline_views.remove_flight, name='remove_flight'),
-    path('airline/my-flight/<int:id>/', airline_views.get_my_flight, name='my-flights'),
+    path('airline/my-flight/<int:id>/', airline_views.get_my_flights, name='my-flights'),
 
     # Customer views
 

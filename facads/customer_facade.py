@@ -8,6 +8,8 @@ from datetime import datetime
 class CustomerFacade(FacadeBase):
 
     def update_customer(customer_id, **kwargs):
+        """ return updated user if the data passes validations. """
+
         try:  # data validations
             if not FacadsValidator.is_username_or_email_exists(username=kwargs['username'], email=kwargs['email']):
                 if FacadsValidator.is_phone_or_credit_exists(phone=kwargs['phone_no'], credit=kwargs['credit_card_no']):
@@ -26,15 +28,19 @@ class CustomerFacade(FacadeBase):
             raise Exception(f'{str(e)}')
 
     def add_ticket(customer_id, flight_id):
+        """ create and return new ticket if data passes validations. """
+
         try:  # check for available tickets
-            flight = DAL.get_by_id(Ticket, flight_id)
+            flight = DAL.get_by_id(Flight, flight_id)
             if flight.departure_time < datetime.no():
                 raise Exception('Flight departed')
             if flight.remaining_tickets < 1:
                 raise Exception('There are no tickets available')
+            
             # update remaining_tickets
             remaining_tickets = flight.remaining_tickets - 1  
             flight = DAL.update(Flight, flight_id, remaining_tickets=remaining_tickets)
+
             # creating ticket
             ticket = DAL.create(Ticket, customer=customer_id, flight=flight_id)
             return ticket
@@ -44,10 +50,13 @@ class CustomerFacade(FacadeBase):
             raise Exception(f'{str(e)}')
 
     def remove_ticket(ticket_id):
+        """ delete and return ticket if it's on time. """
+
         try:
             ticket = DAL.get_by_id(Ticket, ticket_id)
             if ticket.flight.departure_time < datetime.now():
                 raise Exception('Cannot cancel ticket for past flight')
+            
             # update remaining_tickets
             remaining_tickets = ticket.flight.remaining_tickets + 1
             DAL.update(Flight,ticket.flight.id, remaining_tickets=remaining_tickets)
@@ -57,6 +66,8 @@ class CustomerFacade(FacadeBase):
             raise Exception(f'{str(e)}')
 
     def get_my_tickets(customer_id):
+        """ return list of all customer's tickets, if there are any. """
+
         try:
             tickets = DAL.get_tickets_by_customer_id(customer_id)
             return tickets
