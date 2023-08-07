@@ -65,6 +65,7 @@ class CustomerFacade(FacadeBase):
             ticket = DAL.get_by_id(Ticket, ticket_id)
             if ticket.flight.departure_time < datetime.now(pytz.UTC):
                 raise Exception('Cannot cancel ticket for past flight')
+            
             # update remaining_tickets
             remaining_tickets = ticket.flight.remaining_tickets + 1
             DAL.update(Flight, ticket.flight.id,

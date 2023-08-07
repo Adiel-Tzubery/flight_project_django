@@ -20,12 +20,11 @@ def get_all_customers(request):
         serializer = CustomerModelSerializer(
             customers, many=len(customers) > 1)
         return Response(serializer.data)
-    except ObjectDoesNotExist as e:
-        return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
+    except Exception:
+        raise Exception
 
 
 @permission_classes([IsAuthenticated])
-@api_view(['POST'])
 @group_required('administrator')
 def add_airline(request):
     """ get new airline, serialize it and return it's data. """
@@ -107,9 +106,8 @@ def remove_airline(request, airline_id):
 @permission_classes([IsAuthenticated])
 @api_view(['DELETE'])
 @group_required('administrator')
-def remove_customer(request):
-    """ remove customer view. """
-
+@api_view(['DELETE'])
+def remove_customer(request, customer_id):
     try:
         deleted_customer = AdministratorFacade.remove_customer(
             customer_id=request.query_params['customer_id'])
@@ -122,12 +120,10 @@ def remove_customer(request):
 @permission_classes([IsAuthenticated])
 @api_view(['DELETE'])
 @group_required('administrator')
-def remove_administrator(request):
-    """ remove administrator view. """
-
+@api_view(['DELETE'])
+def remove_administrator(request, administrator_id):
     try:
-        deleted_admin = AdministratorFacade.remove_administrator(
-            administrator_id=request.data['administrator_id'])
+        deleted_admin = AdministratorFacade.remove_administrator(administrator_id)
         if deleted_admin:
             return Response({'message': 'Administrator deleted successfully.'})
     except Exception as e:
