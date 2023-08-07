@@ -11,12 +11,9 @@ class AirlineFacade(FacadeBase):
     def update_airline(airline_id, **kwargs):
         """ return updated airline if the data passes validations. """
 
-<<<<<<< HEAD
         # converting to datetime object
         kwargs['departure_time'] = parser.parse(kwargs['departure_time'])
         kwargs['landing_time'] = parser.parse(kwargs['landing_time'])
-=======
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
         try:
             flight = DAL.update(AirlineCompany, airline_id, kwargs)
             return flight
@@ -26,13 +23,10 @@ class AirlineFacade(FacadeBase):
     def add_flight(**kwargs):
         """ create and return new flight if data passes validations. """
 
-<<<<<<< HEAD
         # convert to datetime objects
         kwargs['departure_time'] = parser.parse(kwargs['departure_time'])
         kwargs['landing_time'] = parser.parse(kwargs['landing_time'])
 
-=======
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
         try:
             if FacadsValidator.is_flight_valid(**kwargs):
 
@@ -51,7 +45,6 @@ class AirlineFacade(FacadeBase):
     def update_flight(**kwargs):
         """ return updated airline if the data passes validations. """
 
-<<<<<<< HEAD
         try:
 
             # convert countries to their id's
@@ -80,25 +73,6 @@ class AirlineFacade(FacadeBase):
                 price=price
             ):
 
-=======
-    def update_flight(flight_id, **kwargs):
-        """ return updated airline if the data passes validations. """
-
-        try:
-            origin_country=kwargs['origin_country']
-            destination_country=kwargs['destination_country']
-            departure_time=kwargs['departure_time']
-            landing_time=kwargs['landing_time']
-            remaining_tickets=kwargs['remaining_tickets']
-            price=kwargs['price']
-            if FacadsValidator.is_flight_valid(flight_id=flight_id, origin_country=origin_country,
-                                            destination_country=destination_country,
-                                            departure_time=departure_time,
-                                            landing_time=landing_time,
-                                            remaining_tickets=remaining_tickets,
-                                            price=price):
-                
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
                 # update and return the flight.
                 updated_flight = DAL.update(Flight, flight_id, origin_country=origin_country,
                                             destination_country=destination_country,
@@ -113,15 +87,8 @@ class AirlineFacade(FacadeBase):
     def remove_flight(flight_id):
         """ delete and return flight passes validation. """
 
-<<<<<<< HEAD
         try:  # have flight soled any tickets.
             DAL.get_tickets_by_flight_id(flight_id)
-=======
-        try: # have flight soled any tickets.
-            tickets = DAL.get_tickets_by_flight_id(flight_id)
-            if tickets.exists(): 
-                raise Exception('This flight have sold Tickets: cannot be deleted.')
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
             deleted_flight = DAL.remove(Flight, flight_id)
             return deleted_flight
             # return something

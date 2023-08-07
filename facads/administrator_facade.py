@@ -69,20 +69,12 @@ class AdministratorFacade(FacadeBase):
             )
             # assign user object to kwargs
             kwargs['user'] = user
-<<<<<<< HEAD
             administrator = DAL.create(
                 Administrator,
                 first_name=kwargs['first_name'],
                 last_name=kwargs['last_name'],
                 user=kwargs['user']
             )
-=======
-            administrator = DAL.create(Administrator,
-                                       first_name=kwargs['first_name'],
-                                       last_name=kwargs['last_name'],
-                                       user=kwargs['user']
-                                       )
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
             return administrator
         except Exception as e:
             raise Exception(f'Error: {str(e)}.')
@@ -98,10 +90,6 @@ class AdministratorFacade(FacadeBase):
             raise Exception
 
     def remove_customer(customer_id):
-<<<<<<< HEAD
-=======
-        """ delete and return customer passes validation. """
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
 
         try:  # check if customer exists.
             if FacadsValidator.is_customer_clear_for_delete(customer_id):

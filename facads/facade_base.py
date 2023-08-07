@@ -13,15 +13,10 @@ class FacadeBase:
     def get_user_data(user_id):
         """ return all user data according to it's id """
         try:
-<<<<<<< HEAD
             user_obj = DAL.get_by_id(User, user_id)
             role_data = DAL.get_role_data_by_user(user_obj)
 
             return user_obj, role_data
-=======
-            user_data = DAL.get_by_id(User, user_id)
-            return user_data
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
         except ObjectDoesNotExist:
             raise ObjectDoesNotExist('User does not exists.')
 
@@ -123,7 +118,6 @@ class FacadsValidator:
     @staticmethod
     def is_username_not_exists(username):
         """ check if the username taken """
-<<<<<<< HEAD
         try:
             if DAL.get_user_by_username(username):
                 # this wil be logger: ('username is taken, please try another one.')
@@ -162,68 +156,6 @@ class FacadsValidator:
             if DAL.get_customer_by_phone(phone):
                 # this wil be logger: (f'phone number is taken, please try another one.')
                 raise Exception(f'phone number {phone} is taken')
-=======
-        try:
-            if DAL.get_user_by_username(username):
-                # this wil be logger: ('username is taken, please try another one.')
-                raise Exception(f'username: {username} is taken')
-        except ObjectDoesNotExist:
-            return True
-        except Exception as e:
-            raise Exception(f'error: {str(e)}')
-
-    @staticmethod
-    def is_email_not_exists(email):
-        """ check if the email taken """
-        try:
-            if DAL.get_user_by_email(email):
-                # this wil be logger: ('username is taken, please try another one.')
-                raise Exception(f'email: {email} is taken')
-        except ObjectDoesNotExist:        
-            return True
-        except Exception as e:
-            raise Exception(f'error: {str(e)}')
-
-    @staticmethod
-    def is_airline_name_not_exists(name):
-        try:
-            if DAL.get_airline_by_name(name):
-                raise Exception(f'name: {name} is taken')
-        except ObjectDoesNotExist:
-            return True
-        except Exception as e:
-            raise Exception(f'error: {str(e)}')
-
-    @staticmethod
-    def is_phone_not_exists(phone):
-        " check if phone number taken "
-        try:
-            if DAL.get_customer_by_phone(phone):
-                # this wil be logger: (f'phone number is taken, please try another one.')
-                raise Exception(f'phone number {phone} is taken')
-        except ObjectDoesNotExist:
-            return True
-        except Exception as e:
-            raise Exception(f'Error: {str(e)}.')
-
-    @staticmethod
-    def is_credit_not_exists(credit):
-        """ check if credit card number taken """
-        try:
-            if DAL.get_customer_by_credit(credit):
-                # this wil be logger: ('credit number is taken, pleas try another one.')
-                raise Exception(f'credit card number {credit} taken')
-        except ObjectDoesNotExist:
-            return True
-        except Exception as e:
-            raise Exception(f'Error: {str(e)}.')
-        
-    @staticmethod
-    def is_country_has_no_airline(country_id):
-        try:
-            if DAL.get_airlines_by_country_id(country_id):
-                raise Exception('country cannot have more then one airline.')
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
         except ObjectDoesNotExist:
             return True
         except Exception as e:
@@ -273,7 +205,6 @@ class FacadsValidator:
     def is_customer_clear_for_delete(customer_id):
         """ if customer has no tickets, it's ready to be deleted, in this case the method return True.  """
 
-<<<<<<< HEAD
         customer_exists = DAL.get_by_id(Customer, customer_id)    
         try:    
             # if customer have tickets.
@@ -308,35 +239,6 @@ class FacadsValidator:
             # data validations.
             # pytz.UTC get the current datetime with UTC timezone
             if kwargs['departure_time'] < datetime.now(pytz.UTC):
-=======
-        try:  # check customer exists.
-            customer_exists = DAL.get_by_id(Customer, customer_id)
-            if customer_exists:
-                # if customer have tickets.
-                tickets = DAL.get_tickets_by_customer_id(customer_id)
-                if tickets.exists():
-                    return False
-                return True  # if valid
-            raise ObjectDoesNotExist(
-                f'There are no customer with id: {customer_id}.')
-        except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(
-                f'There are no customer with id: {customer_id}.')
-
-    @staticmethod
-    def is_flight_valid(flight_id, origin_country, destination_country, departure_time, landing_time, remaining_tickets, price):
-        """ return true if all the flight parameters are valid and return True. """
-
-        try:
-            # check if flight took of already.
-            old_flight = DAL.get_by_id(Flight, flight_id)
-            if old_flight.departure_time < datetime.now():
-                raise Exception(
-                    'flight already took off and cannot be updated.')
-
-            # data validations.
-            if departure_time < datetime.now():
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
                 raise Exception('flight date cannot be in the past.')
             if kwargs['remaining_tickets'] < 0:
                 raise Exception('minimum tickets: 0.')
@@ -352,7 +254,6 @@ class FacadsValidator:
             return True
         except Exception as e:
             raise Exception(f'Error: {str(e)}.')
-<<<<<<< HEAD
 
     def is_flight_not_booked(customer_id, flight_id):
         tickets = DAL.get_tickets_by_customer_id(customer_id)
@@ -360,5 +261,3 @@ class FacadsValidator:
             if ticket.flight.id == flight_id:
                 return False
         return True
-=======
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f

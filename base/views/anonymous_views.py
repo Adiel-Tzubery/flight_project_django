@@ -7,10 +7,6 @@ from django.core.exceptions import PermissionDenied, ValidationError
 
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
 # possibly redundant api view (not been called directly from the FA).
 @api_view(['POST'])
 def create_new_user(request, **kwargs):

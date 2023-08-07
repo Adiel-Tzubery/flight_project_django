@@ -9,11 +9,7 @@ from django.db.models import Q
 
 
 class Country(models.Model):
-<<<<<<< HEAD
     name = models.CharField(max_length=80, unique=True)
-=======
-    name = models.CharField(max_length=80 , unique=True)
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
     flag = models.ImageField(
         null=True, blank=True, default='defaults/default_flag_piq.png', upload_to='countries/')
 
@@ -131,13 +127,8 @@ class Ticket(models.Model):
                 f'No customer found with ID {customer_id}')
 
         try:  # get and return the tickets list.
-<<<<<<< HEAD
             tickets = Ticket.objects.filter(customer=customer).first()
             if not tickets:  # if there are no tickets.
-=======
-            tickets = Ticket.objects.filter(customer=customer)
-            if not tickets.exists():  # if there are no tickets.
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
                 raise Ticket.DoesNotExist
             return tickets
         except Ticket.DoesNotExist:
@@ -163,14 +154,9 @@ class CustomUserManager(BaseUserManager):
         kwargs['user_role'] = role
         user = self.model(username=username, email=email, **kwargs)
         user.set_password(password)
-<<<<<<< HEAD
         # save before assigning to group (user need to have id)
         user.save(using=self._db)
         user.groups.add(role.group)  # assign to a group.
-=======
-        user.save(using=self._db) # save before assigning to group (user need to have id)
-        user.groups.add(role.group) # assign to a group.
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
         return user
 
     def create_superuser(self, username, email, password, **kwargs):
@@ -187,11 +173,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     profile_pic = models.ImageField(
-<<<<<<< HEAD
         null=True, blank=True, default='/images/default/default_user_piq.jpeg', upload_to='users/')
-=======
-        null=True, blank=True, default='defaults/default_user_piq.jpeg', upload_to='users/')
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
     created = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'username'
@@ -206,19 +188,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         try:
             user = User.objects.filter(username=username)
             if not user.exists():
-<<<<<<< HEAD
                 raise ObjectDoesNotExist(
                     f'No user found with username: {username}')
             return user
         except User.DoesNotExist:  # if user does not exist.
             raise ObjectDoesNotExist(
                 f'No user found with username: {username}')
-=======
-                raise ObjectDoesNotExist(f'No user found with username: {username}')
-            return user
-        except User.DoesNotExist:  # if user does not exist.
-            raise ObjectDoesNotExist(f'No user found with username: {username}')
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
 
     @staticmethod
     def get_user_by_email(email):
@@ -227,11 +202,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         try:
             user = User.objects.filter(email=email)
             if not user.exists():
-<<<<<<< HEAD
                 raise ObjectDoesNotExist(f'No user found with email: {email}.')
-=======
-                raise ObjectDoesNotExist(f'No user found with email: {email}.')    
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
             return user
         except User.DoesNotExist:
             raise ObjectDoesNotExist(f'No user found with email: {email}.')
@@ -288,21 +259,6 @@ class AirlineCompany(models.Model):
         except AirlineCompany.DoesNotExist:  # if airline does not exists.
             raise ObjectDoesNotExist(
                 f'Airline with username {username} does not exist.')
-<<<<<<< HEAD
-=======
-
-    @staticmethod
-    def get_airline_by_name(name):
-        """ return airline according to it's name. """
-        try:
-            airline = AirlineCompany.objects.filter(name=name)
-            if not airline.exists():
-                raise ObjectDoesNotExist
-            return airline
-        except AirlineCompany.DoesNotExist:
-            raise ObjectDoesNotExist(f'Airline with name {name} does not exists.')
-            
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
 
     @staticmethod
     def get_airline_by_name(name):

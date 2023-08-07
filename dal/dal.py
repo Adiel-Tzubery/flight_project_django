@@ -97,7 +97,6 @@ class DAL:
             instance = DAL.get_by_id(model, id)
             instance.delete()
             return instance
-<<<<<<< HEAD
         except model.DoesNotExist:  # if instance does not exists before deleting.
             raise ObjectDoesNotExist(
                 f'No {model.__name__} found with id {id}.')
@@ -243,12 +242,6 @@ class DAL:
     # ------------------------------------------------------------------------------------------------------------------------------------
 
     #                                        _____@@@@@@@@@______ ADDITIONAL DAL _____@@@@@@@@@_____
-=======
-        except model.DoesNotExist: # if instance does not exists before deleting.
-            raise ObjectDoesNotExist(f'No {model.__name__} found with id {id}.')
-    
-    #------------------------------------------------------------------------------------------------------------------------------------
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
 
     @staticmethod
     def get_customer_by_phone(phone_no):
@@ -429,91 +422,8 @@ class DAL:
                 airline_role_data = AirlineCompany.objects.filter(
                     user=user).first()
 
-<<<<<<< HEAD
                 return {
                     "name": airline_role_data.name,
                     "country":  airline_role_data.country.name,
                     "airline_id": airline_role_data.id
                 }
-=======
-
-    @staticmethod
-    def get_departure_flights(country_id):
-        """ return list of all the flights that are departure in the next 12 hours from specific country. """
-
-        try: # get and return the flights.
-            flights = Flight.get_departure_flights(country_id)
-            if not flights.exists(): # if there are no flights.
-                raise ObjectDoesNotExist('There are no flights from this country.')
-            return flights
-        except Flight.DoesNotExist:
-            raise ObjectDoesNotExist('There are no flights from this country.')
-
-
-    @staticmethod
-    def get_tickets_by_customer_id(customer_id):
-        """ return list of all the customer's tickets. """
-
-        try: # get and return the tickets.
-            tickets = Ticket.get_tickets_by_customer_id(customer_id)
-            if not tickets.exists(): # if there are no tickets.
-                raise ObjectDoesNotExist('Customer have no tickets.')
-            return tickets
-        except Ticket.DoesNotExist:
-            raise ObjectDoesNotExist('Customer have no tickets.')
-
-
-    @staticmethod
-    def get_user_by_username(username):
-        """ return user according to it's username. """
-
-        try: # get and return the user.
-            user = User.get_user_by_username(username)
-            return user
-        except User.DoesNotExist: # if user does not exists.
-            raise ObjectDoesNotExist(f'There is no user with username: {username}.')
-
-
-    @staticmethod
-    def get_user_by_email(email):
-        """ return user according to it's email. """
-
-        try: # get and return the user.
-            user = User.get_user_by_email(email)
-            return user
-        except User.DoesNotExist: # if user does not exists.
-            raise ObjectDoesNotExist(f'There is no user with email: {email}.')
-
-
-    @staticmethod
-    def get_customer_by_username(username):
-        """ return customer according to it's user's username. """
-
-        try: # get and return the customer.
-            customer = Customer.get_customer_by_username(username)
-            return customer
-        except Customer.DoesNotExist: # if customer does not exists.
-            raise ObjectDoesNotExist(f'There is no customer with username: {username}.')
-
-
-    @staticmethod
-    def get_airline_by_username(username):
-        """ return airline according to it's user's username. """
-
-        try: # get and return the airline.
-            airline = AirlineCompany.get_airline_by_username(username)
-            return airline
-        except AirlineCompany.DoesNotExist: # if airline does not exists.
-            raise ObjectDoesNotExist(f'There is no airline with username: {username}.')
-        
-    
-    @staticmethod
-    def get_airline_by_name(name):
-        """ return airline according to it's name. """
-
-        try:
-            airline = AirlineCompany.get_airline_by_name(name)
-            return airline
-        except AirlineCompany.DoesNotExist:
-            raise ObjectDoesNotExist(f'Airline with name {name} does not exists.')
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f

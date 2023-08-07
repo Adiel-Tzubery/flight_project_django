@@ -16,13 +16,3 @@ def group_required(group_name):
                     f'Access Denied. user not belong to group {group_name}.')
         return wrapped_view
     return decorator
-<<<<<<< HEAD
-=======
-
-
-# if request doesn't have the group, why not get to the group
-# manually using the dal?
-#  group = DAL.get_user_by_username(username=request.user.username).user_role.group
-
-# one problem, the value of request.user.username is empty string
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f

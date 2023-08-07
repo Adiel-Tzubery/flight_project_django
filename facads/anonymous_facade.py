@@ -10,7 +10,6 @@ class AnonymousFacade(FacadeBase, FacadsValidator):
     def create_new_user(**kwargs):
         """ create and return new user if data passes validations. """
 
-<<<<<<< HEAD
         try:
             if AnonymousFacade.is_username_not_exists(kwargs['username']):
                 if AnonymousFacade.is_email_not_exists(kwargs['email']):
@@ -21,20 +20,6 @@ class AnonymousFacade(FacadeBase, FacadsValidator):
                         password=kwargs['password'],
                         user_role=kwargs['user_role']
                     )
-=======
-    def create_new_user(**kwargs):
-        """ create and return new user if data passes validations. """
-
-        try:
-            if AnonymousFacade.is_username_not_exists(kwargs['username']):
-                if AnonymousFacade.is_email_not_exists(kwargs['email']):
-                    user = DAL.create(User,
-                                      username=kwargs['username'],
-                                      email=kwargs['email'],
-                                      password=kwargs['password'],
-                                      user_role=kwargs['user_role']
-                                      )
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
                     return user
         except Exception as e:
             raise Exception(f'Error: {str(e)}.')

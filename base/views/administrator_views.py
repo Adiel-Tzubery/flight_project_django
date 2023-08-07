@@ -22,15 +22,9 @@ def get_all_customers(request):
         return Response(serializer.data)
     except ObjectDoesNotExist as e:
         return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
-<<<<<<< HEAD
 
 
 @permission_classes([IsAuthenticated])
-=======
-
-@permission_classes([IsAuthenticated])
-
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
 @api_view(['POST'])
 @group_required('administrator')
 def add_airline(request):
@@ -113,11 +107,7 @@ def remove_airline(request, airline_id):
 @permission_classes([IsAuthenticated])
 @api_view(['DELETE'])
 @group_required('administrator')
-<<<<<<< HEAD
 def remove_customer(request):
-=======
-def remove_customer(request, customer_id):
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
     """ remove customer view. """
 
     try:
@@ -132,20 +122,12 @@ def remove_customer(request, customer_id):
 @permission_classes([IsAuthenticated])
 @api_view(['DELETE'])
 @group_required('administrator')
-<<<<<<< HEAD
 def remove_administrator(request):
-=======
-def remove_administrator(request, administrator_id):
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
     """ remove administrator view. """
 
     try:
         deleted_admin = AdministratorFacade.remove_administrator(
-<<<<<<< HEAD
             administrator_id=request.data['administrator_id'])
-=======
-            administrator_id)
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
         if deleted_admin:
             return Response({'message': 'Administrator deleted successfully.'})
     except Exception as e:

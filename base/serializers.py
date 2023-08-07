@@ -40,26 +40,16 @@ class CountryModelSerializer(serializers.ModelSerializer):
 
 class UserModelSerializer(serializers.ModelSerializer):
     role_name = serializers.CharField(source='get_user_role_name')
-<<<<<<< HEAD
     user_id = serializers.IntegerField(source='id')
-=======
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
 
     class Meta:
         model = User
         fields = [
-<<<<<<< HEAD
             'user_id',
             'email',
             'username',
             'role_name',
             'profile_pic'
-=======
-            'id',
-            'email',
-            'username',
-            'role_name'
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
         ]
 
 

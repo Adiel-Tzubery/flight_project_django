@@ -8,22 +8,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from base.serializers import FlightModelSerializer, AirlineCompanyModelSerializer, CountryModelSerializer, UserModelSerializer
 
-<<<<<<< HEAD
-=======
-
-@permission_classes([IsAuthenticated])
-@api_view(['GET'])
-def get_user_data(request):
-    try:
-        user_data = FacadeBase.get_user_data(request.user.id)
-        serializer = UserModelSerializer(user_data, many=False)
-        return Response(serializer.data)
-    except ObjectDoesNotExist as e:
-        return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
-
-
-@permission_classes([IsAuthenticated])
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_data(request):
@@ -50,27 +34,16 @@ def get_all_flights(request):
 
     try:
         flights = FacadeBase.get_all_flights()
-<<<<<<< HEAD
         # many = True if there is 2 or more flights and False otherwise.
         serializer = FlightModelSerializer(flights, many=len(flights) > 1)
         return Response(serializer.data)
     except ObjectDoesNotExist as e:
         return Response({'message': str(e)}, status=status.HTTP_100_CONTINUE)
-=======
-        serializer = FlightModelSerializer(flights, many=len(flights) > 1)
-        return Response(serializer.data)
-    except ObjectDoesNotExist as e:
-        return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
 
 
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
-<<<<<<< HEAD
 def get_flight_by_id(request):
-=======
-def get_flight_by_id(request, flight_id):
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
     """ getting the flight, serialize it and return it's data. """
 
     try:
@@ -117,11 +90,7 @@ def get_all_airlines(request):
 
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
-<<<<<<< HEAD
 def get_airline_by_id(request):
-=======
-def get_airline_by_id(request, airline_id):
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
     """ getting the airline, serialize it and return it's data. """
 
     try:
@@ -141,11 +110,6 @@ def get_airlines_by_parameters(request):
     try:
         name = request.GET.get("name")
         country_id = request.GET.get("country_id")
-<<<<<<< HEAD
-
-=======
-        
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
         airlines = FacadeBase.get_airline_by_parameters(
             name=name, country_id=country_id)
         serializer = AirlineCompanyModelSerializer(
@@ -170,11 +134,7 @@ def get_all_countries(request):
 
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
-<<<<<<< HEAD
 def get_country_by_id(request):
-=======
-def get_country_by_id(request, country_id):
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
     """ getting the country, serialize it and return it's data. """
 
     try:

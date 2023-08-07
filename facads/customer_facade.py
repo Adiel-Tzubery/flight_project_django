@@ -33,7 +33,6 @@ class CustomerFacade(FacadeBase):
 
         try:  # check for available tickets
             flight = DAL.get_by_id(Flight, flight_id)
-<<<<<<< HEAD
             if flight.departure_time < datetime.now(pytz.UTC):
                 raise Exception('Flight departed')
             if flight.remaining_tickets < 1:
@@ -54,20 +53,6 @@ class CustomerFacade(FacadeBase):
                 return ticket
             else:
                 raise Exception(f'you already booked this flight')
-=======
-            if flight.departure_time < datetime.no():
-                raise Exception('Flight departed')
-            if flight.remaining_tickets < 1:
-                raise Exception('There are no tickets available')
-            
-            # update remaining_tickets
-            remaining_tickets = flight.remaining_tickets - 1  
-            flight = DAL.update(Flight, flight_id, remaining_tickets=remaining_tickets)
-
-            # creating ticket
-            ticket = DAL.create(Ticket, customer=customer_id, flight=flight_id)
-            return ticket
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
         except ObjectDoesNotExist:
             raise ObjectDoesNotExist(f'No Flight found with id {flight_id}')
         except Exception as e:
@@ -80,11 +65,6 @@ class CustomerFacade(FacadeBase):
             ticket = DAL.get_by_id(Ticket, ticket_id)
             if ticket.flight.departure_time < datetime.now(pytz.UTC):
                 raise Exception('Cannot cancel ticket for past flight')
-<<<<<<< HEAD
-
-=======
-            
->>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
             # update remaining_tickets
             remaining_tickets = ticket.flight.remaining_tickets + 1
             DAL.update(Flight, ticket.flight.id,
