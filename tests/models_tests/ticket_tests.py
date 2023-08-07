@@ -71,14 +71,14 @@ class TicketModelTests(TestCase):
         customer_id = TicketModelTests.customer.id
         expected_message = f'No tickets found for customer {customer_id}'
         with self.assertRaises(ObjectDoesNotExist):
-            Ticket.get_tickets_by_customer(customer_id)        
+            Ticket.get_tickets_by_customer_id(customer_id)        
 
 
     def test_get_tickets_by_customer_success(self):
         # test that the method return successfully all the customer's tickets
         customer_id = TicketModelTests.customer.id
         expected_tickets = [self.first_ticket, self.second_ticket]
-        tickets = Ticket.get_tickets_by_customer(customer_id)
+        tickets = Ticket.get_tickets_by_customer_id(customer_id)
         self.assertCountEqual(tickets,expected_tickets)
 
 
@@ -88,8 +88,8 @@ class TicketModelTests(TestCase):
         user = User.objects.create_user(username='adielt', password='password', email='adiel@gmail.com', user_role=TicketModelTests.customer_rol)
         adiel = Customer.objects.create(first_name='adiel', last_name='Tzubery', address='Kfar Hanoar, kfar Hsidim bet', phone_no='666-666-6666', credit_card_no='7654565436', user=user)
         a_tickets = Ticket.objects.create(flight=TicketModelTests.first_flight, customer=adiel)
-        adiel_tickets = Ticket.get_tickets_by_customer(adiel.id)
-        tickets = Ticket.get_tickets_by_customer(customer_id)
+        adiel_tickets = Ticket.get_tickets_by_customer_id(adiel.id)
+        tickets = Ticket.get_tickets_by_customer_id(customer_id)
         self.assertEqual(tickets.count(), 2)
         self.assertEqual(tickets[0].customer, self.customer)
         self.assertEqual(adiel_tickets[0].customer, adiel)
@@ -99,4 +99,4 @@ class TicketModelTests(TestCase):
         customer_id = '999'
         expected_message = f'No customer found with ID {customer_id}'
         with self.assertRaises(ObjectDoesNotExist, msg=expected_message):
-            Ticket.get_tickets_by_customer(customer_id)
+            Ticket.get_tickets_by_customer_id(customer_id)

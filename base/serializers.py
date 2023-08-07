@@ -3,9 +3,27 @@ from .models import *
 
 
 class FlightModelSerializer(serializers.ModelSerializer):
+    # serialize the names rather than the ID's 
+    origin_country = serializers.CharField(source='origin_country.name')
+    destination_country = serializers.CharField(source='destination_country.name')
+    airline_company = serializers.CharField(source='airline_company.name')
+
+    # Serialize departure_time and landing_time with a user-friendly format
+    departure_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
+    landing_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
+    
     class Meta:
         model = Flight
-        fields = '__all__'
+        fields = [
+            'id',
+            'origin_country',
+            'destination_country',
+            'airline_company',
+            'departure_time',
+            'landing_time',
+            'price',
+            'remaining_tickets'
+        ]
 
 
 class AirlineCompanyModelSerializer(serializers.ModelSerializer):
@@ -21,9 +39,28 @@ class CountryModelSerializer(serializers.ModelSerializer):
 
 
 class UserModelSerializer(serializers.ModelSerializer):
+    role_name = serializers.CharField(source='get_user_role_name')
+<<<<<<< HEAD
+    user_id = serializers.IntegerField(source='id')
+=======
+>>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
+
     class Meta:
         model = User
-        fields = '__all__'
+        fields = [
+<<<<<<< HEAD
+            'user_id',
+            'email',
+            'username',
+            'role_name',
+            'profile_pic'
+=======
+            'id',
+            'email',
+            'username',
+            'role_name'
+>>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
+        ]
 
 
 class CustomerModelSerializer(serializers.ModelSerializer):

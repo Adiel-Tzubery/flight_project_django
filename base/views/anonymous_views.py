@@ -6,38 +6,41 @@ from base.serializers import UserModelSerializer, CustomerModelSerializer
 from django.core.exceptions import PermissionDenied, ValidationError
 
 
-# def log_in(request, username, password):
-#     """ login view: accept - request, username and password. """
 
-#     try: # log in the user and returning the authenticated user in json format.
-#         user = AnonymousFacade.log_in(request, username, password)
-#         serializer = UserModelSerializer(user, many=False)
-#         return Response(serializer.data)
-#     except (PermissionDenied, ValidationError): # error handling.
-#         return Response({"error": "Invalid username or password."}, status=status.HTTP_400_BAD_REQUEST)
-#     except Exception:
-#         return Response({"error": "An unexpected error occurred during login."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+<<<<<<< HEAD
+=======
 
-
+>>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
+# possibly redundant api view (not been called directly from the FA).
 @api_view(['POST'])
 def create_new_user(request, **kwargs):
-    """ create new user view. """
+    """ get new user, serialize it and return it's data. """
 
-    try: # creating new user and returning it in json format.
+    try:
         user = AnonymousFacade.create_new_user(kwargs)
         serializer = UserModelSerializer(user, many=False)
         return Response(serializer.data)
-    except Exception as e: # error handling.
-        return Response({f'Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
 @api_view(['POST'])
-def add_customer(request, **kwargs):
-    """ create new customer view. """
+def add_customer(request):
+    """ get new customer, serialize it and return it's data. """
 
-    try: # creating new customer user and returning it in json format.
-        customer = AnonymousFacade.add_customer(kwargs)
+    try:
+        customer = AnonymousFacade.add_customer(
+            username=request.data['username'],
+            email=request.data['email'],
+            password=request.data['password'],
+            first_name=request.data['first_name'],
+            last_name=request.data['last_name'],
+            credit_card_no=request.data['credit_card_no'],
+            phone_no=request.data['phone_no'],
+            address=request.data['address'],
+            user_role=request.data['user_role'],
+        )
         serializer = CustomerModelSerializer(customer, many=False)
         return Response(serializer.data)
-    except Exception as e: # error handling.
-        return Response({f'Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

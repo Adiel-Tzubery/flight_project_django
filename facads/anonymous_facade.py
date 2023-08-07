@@ -5,39 +5,62 @@ from dal.dal import DAL
 from base.models import User, Customer
 
 
-
 class AnonymousFacade(FacadeBase, FacadsValidator):
 
-    # def log_in(request, username, password):
-    #     try:
-    #         user = authenticate(request, username=username, password=password)
-    #         if user is not None:
-    #             login(request, user)
-    #             return user
-    #         else:
-    #             raise PermissionDenied(f"Username and password don't match.")
-    #     except (PermissionDenied, ValidationError) as e:
-    #         raise PermissionDenied("Invalid username or password") from e
-    #     except Exception as e:
-    #         raise Exception(f"Error: {str(e)}")
+    def create_new_user(**kwargs):
+        """ create and return new user if data passes validations. """
 
-
-    def create_new_user(username, email, password, **kwargs):
+<<<<<<< HEAD
         try:
-            if not AnonymousFacade.is_username_or_email_exists(username, email):
-                user = DAL.create(User, username, email, password, **kwargs)
-                return user
+            if AnonymousFacade.is_username_not_exists(kwargs['username']):
+                if AnonymousFacade.is_email_not_exists(kwargs['email']):
+                    user = DAL.create(
+                        User,
+                        username=kwargs['username'],
+                        email=kwargs['email'],
+                        password=kwargs['password'],
+                        user_role=kwargs['user_role']
+                    )
+=======
+    def create_new_user(**kwargs):
+        """ create and return new user if data passes validations. """
+
+        try:
+            if AnonymousFacade.is_username_not_exists(kwargs['username']):
+                if AnonymousFacade.is_email_not_exists(kwargs['email']):
+                    user = DAL.create(User,
+                                      username=kwargs['username'],
+                                      email=kwargs['email'],
+                                      password=kwargs['password'],
+                                      user_role=kwargs['user_role']
+                                      )
+>>>>>>> 67ead05e66aec98e01d0bd2b95b3906e5918d43f
+                    return user
         except Exception as e:
             raise Exception(f'Error: {str(e)}.')
 
+    def add_customer(**kwargs):
+        """ create and return new customer if data passes validations. """
 
-    def add_customer(first_name, last_name, credit_card_no, phone_no, address, username, email, password, user_role):
         try:
-            user = AnonymousFacade.create_new_user(username, email, password)
-            if not AnonymousFacade.is_phone_or_credit_exists(phone_no, credit_card_no):
-                customer = DAL.create(Customer, first_name=first_name, last_name=last_name,
-                                        credit_card_no=credit_card_no, phone_no=phone_no,
-                                        address=address, user=user, user_role=user_role)
-                return customer
+            if AnonymousFacade.is_phone_not_exists(kwargs['phone_no']):
+                if AnonymousFacade.is_credit_not_exists(kwargs['credit_card_no']):
+                    user = AnonymousFacade.create_new_user(
+                        username=kwargs['username'],
+                        email=kwargs['email'],
+                        password=kwargs['password'],
+                        user_role=kwargs['user_role']
+                    )
+                    kwargs['user'] = user
+                    customer = DAL.create(
+                        Customer,
+                        first_name=kwargs['first_name'],
+                        last_name=kwargs['last_name'],
+                        credit_card_no=kwargs['credit_card_no'],
+                        phone_no=kwargs['phone_no'],
+                        address=kwargs['address'],
+                        user=kwargs['user']
+                    )
+                    return customer
         except Exception as e:
             raise Exception(f'Error: {str(e)}.')
