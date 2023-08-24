@@ -1,5 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from base.models import Administrator, AirlineCompany, Flight, Customer, Ticket, User, Country, UserRole
+from base.models import Administrator, AirlineCompany, Flight, Customer, Ticket, User, Country
+from datetime import datetime, time
+
+from django.contrib.auth.hashers import check_password
 
 
 class DAL:
@@ -43,9 +46,9 @@ class DAL:
 
         # if instance is user/superuser/other, preform different creation method.
         try:
-            if 'administrator' in kwargs.values():
+            if 'user_role' in kwargs.keys() and 'administrator' in kwargs.values():
                 obj = model.objects.create_superuser(**kwargs)
-            elif 'customer' in kwargs.values() or 'airline company' in kwargs.values():
+            elif 'user_role' in kwargs.keys() and 'customer' in kwargs.values() or 'airline company' in kwargs.values():
                 obj = model.objects.create_user(**kwargs)
             else:
                 obj = model.objects.create(**kwargs)
@@ -70,13 +73,19 @@ class DAL:
     def update(model, id, **kwargs):
         """ update and return an instance of a requested model. """
 
-        # @@@@@@@@@ handle case of kwargs comes with keys with empty values. @@@@@@@@@ 
-
         try:
             instance = DAL.get_by_id(model, id)
             for key, value in kwargs.items():
-                # handle only the fields that need to be change
-                if hasattr(instance, key):
+                # handle only the fields that need to be change.
+                if key == 'password':
+                    # in different 'if' ( and not in 'and' ) statement to avoid the else case.
+                    # only change password if the value is different from the existing password.
+                    if not check_password(value, instance.user.password):
+                        instance.user.set_password(value)
+                        instance.user.save()
+                        print(check_password(instance.user.password, value))
+                else:
+                    hasattr(instance, key)
                     setattr(instance, key,  value)
             # save and return updated instance.
             instance.save()
@@ -106,19 +115,28 @@ class DAL:
     #                                        _____@@@@@@@@@______ MODEL'S METHODS  DAL _____@@@@@@@@@_____
 
     @staticmethod
-    def get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None):
+    def get_flights_by_parameters(origin_country=None, destination_country=None, date=None):
         """ return list of all the flights or reduce it according to conditions, if there is any. """
+        try:
+            origin_country_id = None
+            destination_country_id = None
+            date_time = None
+            if origin_country:
+                origin_country_id = Country.objects.get(name=origin_country)
+            if destination_country:
+                destination_country_id = Country.objects.get(
+                    name=destination_country)
+            if date:
+                date = datetime.strptime(date, '%Y-%m-%d').date()
+                date_time = datetime.combine(date, time.min)
 
-        try:  # get and return the flights.
             flights = Flight.get_flights_by_parameters(
-                origin_country_id=None, destination_country_id=None, date=None)
-            if not flights.exists():  # if there are no flights.
-                raise ObjectDoesNotExist(
-                    'No flights found with the specified parameters.')
+                origin_country_id, destination_country_id, date_time)
             return flights
         except Flight.DoesNotExist:
             raise ObjectDoesNotExist(
                 'No flights found with the specified parameters.')
+
 
     @staticmethod
     def get_airlines_by_parameters(name=None, country_id=None):
@@ -242,6 +260,24 @@ class DAL:
     # ------------------------------------------------------------------------------------------------------------------------------------
 
     #                                        _____@@@@@@@@@______ ADDITIONAL DAL _____@@@@@@@@@_____
+
+    @staticmethod
+    def get_user_by_customer_id(customer_id):
+        try:
+            customer = DAL.get_by_id(Customer, customer_id)
+            customer_user = DAL.get_by_id(User, customer.user.id)
+            return customer_user
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist
+
+    @staticmethod
+    def get_user_by_airline_id(airline_id):
+        try:
+            airline = DAL.get_by_id(AirlineCompany, airline_id)
+            airline_user = DAL.get_by_id(User, airline.user.id)
+            return airline_user
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist
 
     @staticmethod
     def get_customer_by_phone(phone_no):
@@ -375,11 +411,11 @@ class DAL:
             tickets = Ticket.objects.filter(flight=flight_id)
             if tickets.exists():  # in case the flight hasn't sold any tickets.
                 raise ObjectDoesNotExist(
-                    'This flight have sold Tickets: cannot be canceled.')
+                    'This flight have sold Tickets: first refund all customers and then try again.')
             return tickets
         except ObjectDoesNotExist:
             raise ObjectDoesNotExist(
-                'This flight have sold Tickets: cannot be canceled.')
+                'This flight have sold Tickets: first refund all customers and then try again.')
 
     @staticmethod
     def get_country_by_name(name):

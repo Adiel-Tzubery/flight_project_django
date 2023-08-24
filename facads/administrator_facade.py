@@ -1,8 +1,9 @@
 from dal.dal import DAL
-from .facade_base import FacadeBase, FacadsValidator
+from .facade_base import FacadeBase
+from .facads_validator import FacadsValidator
 from .anonymous_facade import AnonymousFacade
 from django.core.exceptions import ObjectDoesNotExist
-from base.models import Customer, AirlineCompany, Administrator, Country
+from base.models import Customer, AirlineCompany, Administrator, Country, User
 
 
 class AdministratorFacade(FacadeBase):
@@ -46,7 +47,7 @@ class AdministratorFacade(FacadeBase):
         except KeyError:
             raise KeyError('name not provided')
         except Exception as e:
-            raise Exception(f'error: {str(e)}')
+            raise Exception(f'{str(e)}')
 
     def add_customer(**kwargs):
         """ create and return new customer if data passes validations. """
@@ -84,16 +85,21 @@ class AdministratorFacade(FacadeBase):
 
         try:  # check if airline exists.
             if FacadsValidator.is_airline_clear_for_delete(airline_id):
-                deleted_airline = DAL.remove(AirlineCompany, airline_id)
+                airline_user = DAL.get_user_by_airline_id(airline_id)
+                deleted_airline = DAL.remove(User, airline_user.id)
                 return deleted_airline
-        except Exception:
-            raise Exception
+            else:
+                raise Exception(
+                    'Airline have an active flight/s, cannot be removed.')
+        except Exception as e:
+            raise Exception(f'Error: {str(e)}.')
 
     def remove_customer(customer_id):
 
         try:  # check if customer exists.
             if FacadsValidator.is_customer_clear_for_delete(customer_id):
-                deleted_customer = DAL.remove(Customer, customer_id)
+                customer_user = DAL.get_user_by_customer_id(customer_id)
+                deleted_customer = DAL.remove(User, customer_user.id)
                 return deleted_customer
             else:
                 raise Exception('Customer have ticket/s, cannot be deleted')

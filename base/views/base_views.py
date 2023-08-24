@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from base.serializers import FlightModelSerializer, AirlineCompanyModelSerializer, CountryModelSerializer, UserModelSerializer
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_data(request):
@@ -34,8 +35,7 @@ def get_all_flights(request):
 
     try:
         flights = FacadeBase.get_all_flights()
-        # many = True if there is 2 or more flights and False otherwise.
-        serializer = FlightModelSerializer(flights, many=len(flights) > 1)
+        serializer = FlightModelSerializer(flights, many=True)
         return Response(serializer.data)
     except ObjectDoesNotExist as e:
         return Response({'message': str(e)}, status=status.HTTP_100_CONTINUE)
@@ -47,7 +47,8 @@ def get_flight_by_id(request):
     """ getting the flight, serialize it and return it's data. """
 
     try:
-        flight = FacadeBase.get_flight_by_id(request.data['flight_id'])
+        flight = FacadeBase.get_flight_by_id(
+            flight_id=request.query_params['flight_id'])
         serializer = FlightModelSerializer(flight, many=False)
         return Response(serializer.data)
     except ObjectDoesNotExist as e:
@@ -58,20 +59,20 @@ def get_flight_by_id(request):
 @api_view(['GET'])
 def get_flights_by_parameters(request):
     """ getting list of all the flights, serialize it and return it's data. """
-
     try:
-        origin_country_id = request.GET.get("origin_country_id")
-        destination_country_id = request.GET.get("destination_country_id")
-        date = request.GET.get("date")
+        if request.method == 'GET':
+            origin_country = request.query_params['origin_country']
+            destination_country = request.query_params['destination_country']
+            date = request.query_params['departure_time']
 
-        flights = FacadeBase.get_flights_by_parameters(
-            origin_country_id=origin_country_id,
-            destination_country_id=destination_country_id,
-            date=date)
-        serializer = FlightModelSerializer(flights, many=len(flights) > 1)
-        return Response(serializer.data)
+            flights = FacadeBase.get_flights_by_parameters(
+                origin_country, destination_country, date)
+
+            if flights:
+                serializer = FlightModelSerializer(flights, many=True)
+                return Response(serializer.data)
     except ObjectDoesNotExist as e:
-        return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'message': str(e)}, status=status.HTTP_200_OK)
 
 
 @permission_classes([IsAuthenticated])
@@ -82,7 +83,7 @@ def get_all_airlines(request):
     try:
         airlines = FacadeBase.get_all_airlines()
         serializer = AirlineCompanyModelSerializer(
-            airlines, many=len(airlines) > 1)
+            airlines, many=True)
         return Response(serializer.data)
     except ObjectDoesNotExist as e:
         return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
@@ -113,7 +114,7 @@ def get_airlines_by_parameters(request):
         airlines = FacadeBase.get_airline_by_parameters(
             name=name, country_id=country_id)
         serializer = AirlineCompanyModelSerializer(
-            airlines, many=len(airlines) > 1)
+            airlines, many=True)
         return Response(serializer.data)
     except ObjectDoesNotExist as e:
         return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
@@ -126,7 +127,8 @@ def get_all_countries(request):
 
     try:
         countries = FacadeBase.get_all_countries()
-        serializer = CountryModelSerializer(countries, many=len(countries) > 1)
+        serializer = CountryModelSerializer(
+            countries, many=True)
         return Response(serializer.data)
     except ObjectDoesNotExist as e:
         return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)

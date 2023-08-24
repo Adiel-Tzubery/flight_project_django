@@ -1,37 +1,67 @@
-from .facade_base import FacadeBase, FacadsValidator
+from .facads_validator import FacadsValidator
+from .facade_base import FacadeBase
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.hashers import check_password
 from dal.dal import DAL
-from base.models import Customer, Flight, Ticket
+from base.models import Customer, Flight, Ticket, User
 from datetime import datetime
 import pytz
 
 
 class CustomerFacade(FacadeBase):
 
-    def update_customer(customer_id, **kwargs):
+    def update_customer(**kwargs):
         """ return updated user if the data passes validations. """
+        customer = DAL.get_by_id(Customer, kwargs['customer_id'])
 
         try:  # data validations
-            if not FacadsValidator.is_username_or_email_exists(username=kwargs['username'], email=kwargs['email']):
-                if FacadsValidator.is_phone_or_credit_exists(phone=kwargs['phone_no'], credit=kwargs['credit_card_no']):
-                    updated_customer = DAL.update(Customer, customer_id,
-                                                  username=kwargs['username'],
-                                                  email=kwargs['email'],
-                                                  password=kwargs['password'],
-                                                  profile_piq=kwargs['profile_piq'],
-                                                  first_name=kwargs['first_name'],
-                                                  last_name=kwargs['last_name'],
-                                                  credit_card_no=kwargs['credit_card_no'],
-                                                  phone_no=kwargs['phone_no'],
-                                                  address=kwargs['address'])
-                    return updated_customer
+            if customer.user.username != kwargs['username'] and FacadsValidator.is_username_not_exists(username=kwargs['username']) or customer.user.username == kwargs['username']:
+                if customer.user.email != kwargs['email'] and FacadsValidator.is_email_not_exists(kwargs['email']) or customer.user.email == kwargs['email']:
+                    if customer.phone_no != kwargs['phone_no'] and FacadsValidator.is_phone_not_exists(phone=kwargs['phone_no']) or customer.phone_no == kwargs['phone_no']:
+                        if kwargs['credit_card_no'] != '' and FacadsValidator.is_credit_not_exists(credit=kwargs['credit_card_no']) or kwargs['credit_card_no'] == '':
+
+                            # if there is new password, set it, else set it to original
+                            if kwargs['new_password'] != '':
+                                if check_password(kwargs['password'], customer.user.password):
+                                    kwargs['password'] = kwargs['new_password']
+                                else:
+                                    raise Exception('old password not match')
+                            else:
+                                kwargs['password'] = customer.user.password
+
+
+                            # if not provided, set the credit to original
+                            if kwargs['credit_card_no'] == '':
+                                kwargs['credit_card_no'] = customer.credit_card_no
+
+                            # update user
+                            id = customer.user.id  # to user id
+                            DAL.update(
+                                User,
+                                id,
+                                username=kwargs['username'],
+                                email=kwargs['email'],
+                            )
+
+                            # update customer
+                            id = kwargs['customer_id']  # to customer id
+                            updated_customer = DAL.update(
+                                Customer,
+                                id,
+                                password=kwargs['password'],
+                                first_name=kwargs['first_name'],
+                                last_name=kwargs['last_name'],
+                                credit_card_no=kwargs['credit_card_no'],
+                                phone_no=kwargs['phone_no'],
+                                address=kwargs['address'])
+                            return updated_customer
         except Exception as e:
             raise Exception(f'{str(e)}')
 
     def add_ticket(customer_id, flight_id):
         """ create and return new ticket if data passes validations. """
 
-        try:  # check for available tickets
+        try:  # check for available tickets + if flight took off
             flight = DAL.get_by_id(Flight, flight_id)
             if flight.departure_time < datetime.now(pytz.UTC):
                 raise Exception('Flight departed')
@@ -46,9 +76,9 @@ class CustomerFacade(FacadeBase):
                 ticket = DAL.create(Ticket, customer=customer, flight=flight)
 
                 # update remaining_tickets
+                remaining_tickets = flight.remaining_tickets - 1
                 flight = DAL.update(Flight, flight_id,
                                     remaining_tickets=remaining_tickets)
-                remaining_tickets = flight.remaining_tickets - 1
 
                 return ticket
             else:
@@ -65,11 +95,13 @@ class CustomerFacade(FacadeBase):
             ticket = DAL.get_by_id(Ticket, ticket_id)
             if ticket.flight.departure_time < datetime.now(pytz.UTC):
                 raise Exception('Cannot cancel ticket for past flight')
-            
+
             # update remaining_tickets
             remaining_tickets = ticket.flight.remaining_tickets + 1
-            DAL.update(Flight, ticket.flight.id,
-                       remaining_tickets=remaining_tickets)
+            DAL.update(
+                Flight,
+                ticket.flight.id,
+                remaining_tickets=remaining_tickets)
             deleted_ticket = DAL.remove(Ticket, ticket_id)
             return deleted_ticket
         except Exception as e:

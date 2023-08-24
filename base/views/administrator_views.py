@@ -18,13 +18,14 @@ def get_all_customers(request):
     try:
         customers = AdministratorFacade.get_all_customers()
         serializer = CustomerModelSerializer(
-            customers, many=len(customers) > 1)
+            customers, many=True)
         return Response(serializer.data)
     except Exception:
         raise Exception
 
 
 @permission_classes([IsAuthenticated])
+@api_view(['POST'])
 @group_required('administrator')
 def add_airline(request):
     """ get new airline, serialize it and return it's data. """
@@ -48,7 +49,7 @@ def add_airline(request):
 @api_view(['POST'])
 @group_required('administrator')
 def add_customer(request):
-    """ get new airline, serialize it and return it's data. """
+    """ get new customer, serialize it and return it's data. """
 
     try:
         customer = AdministratorFacade.add_customer(
@@ -92,11 +93,12 @@ def add_administrator(request):
 @permission_classes([IsAuthenticated])
 @api_view(['DELETE'])
 @group_required('administrator')
-def remove_airline(request, airline_id):
+def remove_airline(request):
     """ remove airline view. """
 
     try:
-        deleted_airline = AdministratorFacade.remove_airline(airline_id)
+        deleted_airline = AdministratorFacade.remove_airline(
+            airline_id=request.query_params['airline_id'])
         if deleted_airline:
             return Response({'message': 'Airline deleted successfully.'})
     except Exception as e:
@@ -106,8 +108,7 @@ def remove_airline(request, airline_id):
 @permission_classes([IsAuthenticated])
 @api_view(['DELETE'])
 @group_required('administrator')
-@api_view(['DELETE'])
-def remove_customer(request, customer_id):
+def remove_customer(request):
     try:
         deleted_customer = AdministratorFacade.remove_customer(
             customer_id=request.query_params['customer_id'])
@@ -123,7 +124,8 @@ def remove_customer(request, customer_id):
 @api_view(['DELETE'])
 def remove_administrator(request, administrator_id):
     try:
-        deleted_admin = AdministratorFacade.remove_administrator(administrator_id)
+        deleted_admin = AdministratorFacade.remove_administrator(
+            administrator_id)
         if deleted_admin:
             return Response({'message': 'Administrator deleted successfully.'})
     except Exception as e:

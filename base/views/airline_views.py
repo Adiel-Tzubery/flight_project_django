@@ -11,24 +11,24 @@ from auth.auth import group_required
 
 
 @permission_classes([IsAuthenticated])
-@api_view(['POST'])
+@api_view(['PUT'])
 @group_required('airline company')
 def update_airline(request):
     """ getting the updated airline, serialize the new one and return the data. """
-
     try:
         updated_airline = AirlineFacade.update_airline(
             airline_id=request.data['airline_id'],
             username=request.data['username'],
             email=request.data['email'],
             password=request.data['password'],
+            new_password=request.data['new_password'],
             name=request.data['name'],
-            country=request.data['country']
         )
         serializer = AirlineCompanyModelSerializer(updated_airline, many=False)
         return Response(serializer.data)
     except Exception as e:
         return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])
@@ -74,6 +74,7 @@ def update_flight(request):
     except Exception as e:
         return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @permission_classes([IsAuthenticated])
 @api_view(['DELETE'])
 @group_required('airline company')
@@ -81,22 +82,24 @@ def remove_flight(request):
     """ remove flight view. """
 
     try:
-        deleted_flight = AirlineFacade.remove_flight(flight_id=request.query_params['flight_id'])
+        deleted_flight = AirlineFacade.remove_flight(
+            flight_id=request.query_params['flight_id'])
         if deleted_flight:
             return Response({'message': 'Flight deleted successfully.'})
     except Exception as e:
         return Response({'message': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
+
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 @group_required('airline company')
-def get_my_flights(request):       
+def get_my_flights(request):
     """ getting list of airline's flights, serialize it and return the data. """
 
     try:
         flights = AirlineFacade.get_my_flights(
             airline_id=request.query_params['airline_id'])
-        serializer = FlightModelSerializer(flights, many=len(flights) > 1)
+        serializer = FlightModelSerializer(flights, many=True)
         return Response(serializer.data)
     except ObjectDoesNotExist as e:
-        return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'message': str(e)}, status=status.HTTP_100_CONTINUE)

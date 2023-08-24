@@ -1,22 +1,51 @@
-from .facade_base import FacadeBase, FacadsValidator
+from .facads_validator import FacadsValidator
+from .facade_base import FacadeBase
 from django.core.exceptions import ObjectDoesNotExist
 from dal.dal import DAL
-from base.models import AirlineCompany, Flight, Country
+from base.models import AirlineCompany, Flight, Country, User
+from django.contrib.auth.hashers import check_password
+
 from dateutil import parser
+from datetime import datetime
 import pytz
 
 
 class AirlineFacade(FacadeBase):
 
-    def update_airline(airline_id, **kwargs):
+    def update_airline(**kwargs):
         """ return updated airline if the data passes validations. """
+        airline = DAL.get_by_id(AirlineCompany, kwargs['airline_id'])
 
-        # converting to datetime object
-        kwargs['departure_time'] = parser.parse(kwargs['departure_time'])
-        kwargs['landing_time'] = parser.parse(kwargs['landing_time'])
-        try:
-            flight = DAL.update(AirlineCompany, airline_id, kwargs)
-            return flight
+        try:  # data validations
+            if airline.user.username != kwargs['username'] and FacadsValidator.is_username_not_exists(username=kwargs['username']) or airline.user.username == kwargs['username']:
+                if airline.user.email != kwargs['email'] and FacadsValidator.is_email_not_exists(kwargs['email']) or airline.user.email == kwargs['email']:
+
+                    # if there is new password, set it, else set it to original
+                    if kwargs['new_password'] != '':
+                        if check_password(kwargs['password'], airline.user.password):
+                            kwargs['password'] = kwargs['new_password']
+                        else:
+                            raise Exception('old password not match')
+                    else:
+                        kwargs['password'] = airline.user.password
+
+                    # update user
+                    id = airline.user.id  # to user id
+                    DAL.update(
+                        User,
+                        id,
+                        username=kwargs['username'],
+                        email=kwargs['email'],
+                    )
+
+                    # update airline
+                    id = kwargs['airline_id']  # to airline id
+                    updated_airline = DAL.update(
+                        AirlineCompany,
+                        id,
+                        password=kwargs['password'],
+                        name=kwargs['name'])
+                    return updated_airline
         except Exception as e:
             raise Exception(f'{str(e)}')
 
@@ -85,13 +114,15 @@ class AirlineFacade(FacadeBase):
             raise Exception(f'{str(e)}')
 
     def remove_flight(flight_id):
-        """ delete and return flight passes validation. """
-
-        try:  # have flight soled any tickets.
-            DAL.get_tickets_by_flight_id(flight_id)
+        """ only if flight landed/haven't sold any tickets/all tickets returned """
+        try:
+            flight = DAL.get_by_id(Flight, flight_id)
+            # if flight landed, continue. if not, check for ticket/s.
+            if flight.landing_time >= datetime.now(pytz.UTC):
+                # have flight soled any tickets.
+                DAL.get_tickets_by_flight_id(flight_id)
             deleted_flight = DAL.remove(Flight, flight_id)
             return deleted_flight
-            # return something
         except Exception as e:
             raise Exception(f'{str(e)}')
 

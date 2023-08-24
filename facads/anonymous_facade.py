@@ -1,6 +1,5 @@
-from .facade_base import FacadeBase, FacadsValidator
-from django.contrib.auth import authenticate, login
-from django.core.exceptions import PermissionDenied, ValidationError
+from .facads_validator import FacadsValidator
+from .facade_base import FacadeBase
 from dal.dal import DAL
 from base.models import User, Customer
 
@@ -36,6 +35,7 @@ class AnonymousFacade(FacadeBase, FacadsValidator):
                         password=kwargs['password'],
                         user_role=kwargs['user_role']
                     )
+
                     kwargs['user'] = user
                     customer = DAL.create(
                         Customer,

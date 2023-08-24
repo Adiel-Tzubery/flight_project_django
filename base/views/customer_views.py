@@ -13,7 +13,7 @@ from auth.auth import group_required
 
 
 @permission_classes([IsAuthenticated])
-@api_view(['POST'])
+@api_view(['PUT'])
 @group_required('customer')
 def update_customer(request):
     """ getting the updated customer, serialize the new user and return the data. """
@@ -23,6 +23,7 @@ def update_customer(request):
             username=request.data['username'],
             email=request.data['email'],
             password=request.data['password'],
+            new_password=request.data['new_password'],
             first_name=request.data['first_name'],
             last_name=request.data['last_name'],
             credit_card_no=request.data['credit_card_no'],
@@ -33,6 +34,7 @@ def update_customer(request):
         return Response(serializer.data)
     except Exception as e:
         return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])
@@ -49,15 +51,14 @@ def add_ticket(request):
     except Exception as e:
         return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @permission_classes([IsAuthenticated])
 @api_view(['DELETE'])
 @group_required('customer')
 def remove_ticket(request):
-    """ remove ticket view. """
-
     try:
         deleted_ticket = CustomerFacade.remove_ticket(
-            ticket_id=request.data['ticket_id'])
+            ticket_id=request.query_params['ticket_id'])
         if deleted_ticket:
             return Response({'message': 'Ticket deleted successfully.'})
     except Exception as e:
@@ -72,10 +73,9 @@ def get_my_tickets(request):
     try:
         # customer_id = Customer.objects.filter(
         #     user=request.user.id).first().user
-
         tickets = CustomerFacade.get_my_tickets(
             customer_id=request.query_params['customer_id'])
-        serializer = TicketModelSerializer(tickets, many=len(tickets) > 1)
+        serializer = TicketModelSerializer(tickets, many=True)
         return Response(serializer.data)
     except ObjectDoesNotExist as e:
         return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)

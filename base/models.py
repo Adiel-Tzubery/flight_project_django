@@ -43,7 +43,9 @@ class Flight(models.Model):
         if destination_country_id is not None:
             filter_conditions &= Q(destination_country=destination_country_id)
         if date is not None:
-            filter_conditions &= Q(departure_time__date=date)
+            filter_conditions &= Q(departure_time__gte=date)
+            filter_conditions &= Q(departure_time__lte=date.replace(
+                hour=23, minute=59, second=59))
 
         if not filter_conditions:  # if there are no conditions.
             try:
@@ -127,7 +129,7 @@ class Ticket(models.Model):
                 f'No customer found with ID {customer_id}')
 
         try:  # get and return the tickets list.
-            tickets = Ticket.objects.filter(customer=customer).first()
+            tickets = Ticket.objects.filter(customer=customer)
             if not tickets:  # if there are no tickets.
                 raise Ticket.DoesNotExist
             return tickets
@@ -173,7 +175,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     profile_pic = models.ImageField(
-        null=True, blank=True, default='/images/default/default_user_piq.jpeg', upload_to='users/')
+        null=True, blank=True, default='https://api.dicebear.com/6.x/bottts-neutral/svg', upload_to='users/')
     created = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'username'
