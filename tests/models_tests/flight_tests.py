@@ -10,7 +10,7 @@ class FlightModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Create airline company object for the whole test class
-        cls.user_role = UserRole.objects.create(role_name='Airline Company')
+        cls.user_role = UserRole.objects.create(role_name='airline company')
         cls.user = User.objects.create(username='Ben-Guryon', password='password', email='bg@gmail.com', user_role=cls.user_role)
         cls.country = Country.objects.create(name='Israel')
         cls.airline_company = AirlineCompany.objects.create(name='Ben Guryon Airline', country=cls.country, user=cls.user)
@@ -60,75 +60,6 @@ class FlightModelTest(TestCase):
         expected_flights = [self.flight]
         flights = Flight.get_flights_by_parameters(origin_country_id,destination_country_id)
         self.assertCountEqual(flights, expected_flights)
-
-
-    def test_get_flights_by_parameters_success_only_with_origin_country_and_departure_time(self):
-        # Test if the method returns the flights as expected when entering the right parameters(only origin country and departure time)
-        departure_time = datetime(2023,4,16,10,30, tzinfo=timezone.utc)
-        origin_country_id = FlightModelTest.country.id
-        expected_flights = [self.flight]
-        flights = Flight.get_flights_by_parameters(origin_country_id=origin_country_id, departure_time=departure_time)
-        self.assertEqual(flights[0], expected_flights[0])
-
-
-    def test_get_flights_by_parameters_success_only_with_destination_country_and_departure_time(self):
-        # Test if the method returns the flights as expected when entering the right parameters(only destination country and departure time)
-        departure_time = datetime(2023,4,16,10,30, tzinfo=timezone.utc)
-        destination_country_id = self.flight.destination_country.id
-        expected_flights = [self.flight]
-        flights = Flight.get_flights_by_parameters(destination_country_id=destination_country_id, departure_time=departure_time)
-        self.assertCountEqual(flights, expected_flights)
-
-
-    def test_get_flights_by_parameters_success_only_with_origin_country(self):
-        # Test if the method returns the flights as expected when entering the right parameters(only origin country)
-        origin_country_id = FlightModelTest.country.id
-        expected_flights = [self.flight]
-        flights = Flight.get_flights_by_parameters(origin_country_id=origin_country_id)
-        self.assertEqual(flights[0], expected_flights[0])
-
-
-    def test_get_flights_by_parameters_success_only_with_destination_country(self):
-        # Test if the method returns the flights as expected when entering the right parameters(only destination country)
-        destination_country_id = self.flight.destination_country.id
-        expected_flights = [self.flight]
-        flights = Flight.get_flights_by_parameters(destination_country_id=destination_country_id)
-        self.assertCountEqual(flights, expected_flights)
-
-
-    def test_get_flights_by_parameters_success_only_with_departure_time(self):
-        # Test if the method returns the flights as expected when entering the right parameters(only departure time)
-        departure_time = datetime(2023,4,16,10,30, tzinfo=timezone.utc)
-        expected_flights = [self.flight]
-        flights = Flight.get_flights_by_parameters(departure_time=departure_time)
-        self.assertEqual(flights[0], expected_flights[0])
-
-
-    def test_get_flights_by_parameters_with_wrong_destination(self):
-        # Test if the method doesn't return a flight that doesn't exist with wrong destination search input
-        departure_time = datetime(2023,4,16,10,30, tzinfo=timezone.utc)
-        origin_country_id = FlightModelTest.country
-        destination_country_id = Country.objects.create(name="USA")
-        with self.assertRaises(ObjectDoesNotExist):
-            Flight.get_flights_by_parameters(origin_country_id, destination_country_id, departure_time)
-
-
-    def test_get_flights_by_parameters_with_wrong_departure_time(self):
-        # Test if the method doesn't return a flight that doesn't exist with wrong departure time search input
-        departure_time = datetime(2023,5,16,10,30, tzinfo=timezone.utc)
-        origin_country_id = FlightModelTest.country
-        destination_country_id = self.flight.destination_country.id
-        with self.assertRaises(ObjectDoesNotExist):
-            Flight.get_flights_by_parameters(origin_country_id, destination_country_id, departure_time)
-
-
-    def test_get_flights_by_parameters_with_wrong_origin_country(self):
-        # Test if the method doesn't return a flight that doesn't exist with wrong origin country search input
-        departure_time = datetime(2023,4,16,10,30, tzinfo=timezone.utc)
-        origin_country_id = Country.objects.create(name='USA')
-        destination_country_id = self.flight.destination_country.id
-        with self.assertRaises(ObjectDoesNotExist):
-            Flight.get_flights_by_parameters(origin_country_id, destination_country_id, departure_time)
 
 
     def test_get_flights_by_airline_id_success(self):

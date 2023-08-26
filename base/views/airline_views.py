@@ -14,7 +14,6 @@ from auth.auth import group_required
 @api_view(['PUT'])
 @group_required('airline company')
 def update_airline(request):
-    """ getting the updated airline, serialize the new one and return the data. """
     try:
         updated_airline = AirlineFacade.update_airline(
             airline_id=request.data['airline_id'],
@@ -34,8 +33,6 @@ def update_airline(request):
 @api_view(['POST'])
 @group_required('airline company')
 def add_flight(request):
-    """ getting new flight, serialize it and return the data """
-
     try:
         flight = AirlineFacade.add_flight(
             airline_company=request.data['airline_company'],
@@ -56,8 +53,6 @@ def add_flight(request):
 @api_view(['PUT'])
 @group_required('airline company')
 def update_flight(request):
-    """ getting the updated flight, serialize the new one and return the data. """
-
     try:
         updated_flight = AirlineFacade.update_flight(
             airline_company=request.data['airline_company'],
@@ -73,14 +68,12 @@ def update_flight(request):
         return Response(serializer.data)
     except Exception as e:
         return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
 
 @permission_classes([IsAuthenticated])
 @api_view(['DELETE'])
 @group_required('airline company')
 def remove_flight(request):
-    """ remove flight view. """
-
     try:
         deleted_flight = AirlineFacade.remove_flight(
             flight_id=request.query_params['flight_id'])
@@ -94,8 +87,6 @@ def remove_flight(request):
 @api_view(['GET'])
 @group_required('airline company')
 def get_my_flights(request):
-    """ getting list of airline's flights, serialize it and return the data. """
-
     try:
         flights = AirlineFacade.get_my_flights(
             airline_id=request.query_params['airline_id'])

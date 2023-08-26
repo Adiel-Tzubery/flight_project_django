@@ -1,7 +1,7 @@
 from facads.administrator_facade import AdministratorFacade
 from auth.auth import group_required
 from base.serializers import CustomerModelSerializer, AirlineCompanyModelSerializer, AdministratorModelSerializer
-from django.core.exceptions import ObjectDoesNotExist
+
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -13,8 +13,7 @@ from rest_framework import status
 @api_view(['GET'])
 @group_required('administrator')
 def get_all_customers(request):
-    """ getting list of all the customers, serialize it and return it's data. """
-
+    """ return serialized list of customers """
     try:
         customers = AdministratorFacade.get_all_customers()
         serializer = CustomerModelSerializer(
@@ -28,8 +27,6 @@ def get_all_customers(request):
 @api_view(['POST'])
 @group_required('administrator')
 def add_airline(request):
-    """ get new airline, serialize it and return it's data. """
-
     try:
         airline = AdministratorFacade.add_airline(
             username=request.data['username'],
@@ -49,8 +46,6 @@ def add_airline(request):
 @api_view(['POST'])
 @group_required('administrator')
 def add_customer(request):
-    """ get new customer, serialize it and return it's data. """
-
     try:
         customer = AdministratorFacade.add_customer(
             username=request.data['username'],
@@ -73,8 +68,6 @@ def add_customer(request):
 @api_view(['POST'])
 @group_required('administrator')
 def add_administrator(request):
-    """ get new airline, serialize it and return it's data. """
-
     try:
         administrator = AdministratorFacade.add_administrator(
             username=request.data['username'],
@@ -94,8 +87,6 @@ def add_administrator(request):
 @api_view(['DELETE'])
 @group_required('administrator')
 def remove_airline(request):
-    """ remove airline view. """
-
     try:
         deleted_airline = AdministratorFacade.remove_airline(
             airline_id=request.query_params['airline_id'])

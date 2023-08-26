@@ -9,7 +9,7 @@ class FlightModelSerializer(serializers.ModelSerializer):
         source='destination_country.name')
     airline_company = serializers.CharField(source='airline_company.name')
 
-    # Serialize departure_time and landing_time with a user-friendly format
+    # Serialize departure_time and landing_time in a user-friendly format
     departure_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
     landing_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
 
@@ -28,7 +28,9 @@ class FlightModelSerializer(serializers.ModelSerializer):
 
 
 class AirlineCompanyModelSerializer(serializers.ModelSerializer):
-    airline_number = serializers.IntegerField(source='id')
+    airline_number = serializers.IntegerField(source='id') # change the key name 
+
+    # serialize the names rather than the ID's
     base_country = serializers.CharField(source='country.name')
     company_name = serializers.CharField(source='name')
 
@@ -48,8 +50,11 @@ class CountryModelSerializer(serializers.ModelSerializer):
 
 
 class UserModelSerializer(serializers.ModelSerializer):
-    role_name = serializers.CharField(source='get_user_role_name')
     user_id = serializers.IntegerField(source='id')
+
+    # add the role name to the serialized user data
+    role_name = serializers.CharField(source='get_user_role_name')
+
 
     class Meta:
         model = User

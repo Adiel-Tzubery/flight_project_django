@@ -9,12 +9,12 @@ class FacadsValidator:
 
     """ class that contain all the facads validation checks. """
 
+    #                                       @@@@@@@@@@@@@@@@@@@_______ USER VALIDATIONS _______@@@@@@@@@@@@@@@@@@@
+
     @staticmethod
     def is_username_not_exists(username):
-        """ check if the username taken """
         try:
             if DAL.get_user_by_username(username):
-                # this wil be logger: ('username is taken, please try another one.')
                 raise Exception(f'username: {username} is taken')
         except ObjectDoesNotExist:
             return True
@@ -23,13 +23,59 @@ class FacadsValidator:
 
     @staticmethod
     def is_email_not_exists(email):
-        """ check if the email taken """
         try:
             if DAL.get_user_by_email(email):
-                # this wil be logger: ('username is taken, please try another one.')
                 raise Exception(f'email: {email} is taken')
         except ObjectDoesNotExist:
             return True
+        except Exception as e:
+            raise Exception(f'error: {str(e)}')
+
+    #                                       @@@@@@@@@@@@@@@@@@@_______ CUSTOMER VALIDATIONS _______@@@@@@@@@@@@@@@@@@@
+
+    @staticmethod
+    def is_phone_not_exists(phone):
+        try:
+            if DAL.get_customer_by_phone(phone):
+                raise Exception(f'phone number {phone} is taken')
+        except ObjectDoesNotExist:
+            return True
+        except Exception as e:
+            raise Exception(f'Error: {str(e)}.')
+
+    @staticmethod
+    def is_credit_not_exists(credit):
+        try:
+            if DAL.get_customer_by_credit(credit):
+                raise Exception(f'credit card number {credit} taken')
+        except ObjectDoesNotExist:
+            return True
+        except Exception as e:
+            raise Exception(f'Error: {str(e)}.')
+
+    @staticmethod
+    def is_customer_clear_for_delete(customer_id):
+        """ delete only if customer has no active tickets """
+
+        try:
+            tickets = DAL.get_tickets_by_customer_id(customer_id)
+            # check for an active flight
+            for ticket in tickets:
+                flight = DAL.get_by_id(Flight, ticket.flight.id)
+                if flight.landing_time >= datetime.now(pytz.UTC):
+                    return False
+            return True
+        except:  # if customer haven't got any tickets.
+            return True
+
+    #                                       @@@@@@@@@@@@@@@@@@@_______ AIRLINE COMPANY VALIDATIONS _______@@@@@@@@@@@@@@@@@@@
+
+    @staticmethod
+    def validate_airline_before_creation(name, country_id):
+        try:
+            if FacadsValidator.is_airline_name_not_exists(name):
+                if FacadsValidator.is_country_has_no_airline(country_id):
+                    return True
         except Exception as e:
             raise Exception(f'error: {str(e)}')
 
@@ -44,30 +90,6 @@ class FacadsValidator:
             raise Exception(f'error: {str(e)}')
 
     @staticmethod
-    def is_phone_not_exists(phone):
-        " check if phone number taken "
-        try:
-            if DAL.get_customer_by_phone(phone):
-                # this wil be logger: (f'phone number is taken, please try another one.')
-                raise Exception(f'phone number {phone} is taken')
-        except ObjectDoesNotExist:
-            return True
-        except Exception as e:
-            raise Exception(f'Error: {str(e)}.')
-
-    @staticmethod
-    def is_credit_not_exists(credit):
-        """ check if credit card number taken """
-        try:
-            if DAL.get_customer_by_credit(credit):
-                # this wil be logger: ('credit number is taken, pleas try another one.')
-                raise Exception(f'credit card number {credit} taken')
-        except ObjectDoesNotExist:
-            return True
-        except Exception as e:
-            raise Exception(f'Error: {str(e)}.')
-
-    @staticmethod
     def is_country_has_no_airline(country_id):
         try:
             if DAL.get_airlines_by_country_id(country_id):
@@ -79,10 +101,8 @@ class FacadsValidator:
 
     @staticmethod
     def is_airline_clear_for_delete(airline_id):
-        """ check if airline have active flight/s. if do, the method return True. """
-
+        """ delete only if airline have active flight/s."""
         try:
-            # if airline have flights.
             flights = DAL.get_flights_by_airline_id(airline_id)
             if flights.exists():
                 for flight in flights:
@@ -95,22 +115,11 @@ class FacadsValidator:
         except ObjectDoesNotExist as e:
             return True
 
-    @staticmethod
-    def is_customer_clear_for_delete(customer_id):
-        """ if customer has no tickets, it's ready to be deleted, in this case the method return True.  """
-
-        customer_exists = DAL.get_by_id(Customer, customer_id)
-        try:
-            # if customer have tickets.
-            if DAL.get_tickets_by_customer_id(customer_id):
-                return False
-        except:  # if not valid
-            return True
+    #                                       @@@@@@@@@@@@@@@@@@@_______ FLIGHT VALIDATIONS _______@@@@@@@@@@@@@@@@@@@
 
     @staticmethod
     def is_flight_valid(**kwargs):
         """ return true if all the flight parameters are valid and return True. """
-
         try:
 
             # flight airline
@@ -158,10 +167,3 @@ class FacadsValidator:
         # if user has no tickets
         except ObjectDoesNotExist:
             return True
-
-    # def is_flight_clear_for_delete(**kwargs):
-        # if departure_date passed: departure_date < datetime.now()
-        #   return true
-        # elif flight sold any tickets:
-        #   return false
-        # flight hasn't sold any tickets and

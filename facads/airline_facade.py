@@ -13,10 +13,9 @@ import pytz
 class AirlineFacade(FacadeBase):
 
     def update_airline(**kwargs):
-        """ return updated airline if the data passes validations. """
         airline = DAL.get_by_id(AirlineCompany, kwargs['airline_id'])
 
-        try:  # data validations
+        try:  # consider possibility that not every fields are to update
             if airline.user.username != kwargs['username'] and FacadsValidator.is_username_not_exists(username=kwargs['username']) or airline.user.username == kwargs['username']:
                 if airline.user.email != kwargs['email'] and FacadsValidator.is_email_not_exists(kwargs['email']) or airline.user.email == kwargs['email']:
 
@@ -50,8 +49,6 @@ class AirlineFacade(FacadeBase):
             raise Exception(f'{str(e)}')
 
     def add_flight(**kwargs):
-        """ create and return new flight if data passes validations. """
-
         # convert to datetime objects
         kwargs['departure_time'] = parser.parse(kwargs['departure_time'])
         kwargs['landing_time'] = parser.parse(kwargs['landing_time'])
@@ -72,10 +69,7 @@ class AirlineFacade(FacadeBase):
             raise Exception(f'{str(e)}')
 
     def update_flight(**kwargs):
-        """ return updated airline if the data passes validations. """
-
         try:
-
             # convert countries to their id's
             origin_country = DAL.get_country_by_name(
                 name=kwargs['origin_country'])
@@ -114,7 +108,7 @@ class AirlineFacade(FacadeBase):
             raise Exception(f'{str(e)}')
 
     def remove_flight(flight_id):
-        """ only if flight landed/haven't sold any tickets/all tickets returned """
+        """ delete only if flight landed/haven't sold any tickets/all tickets returned """
         try:
             flight = DAL.get_by_id(Flight, flight_id)
             # if flight landed, continue. if not, check for ticket/s.
@@ -127,8 +121,6 @@ class AirlineFacade(FacadeBase):
             raise Exception(f'{str(e)}')
 
     def get_my_flights(airline_id):
-        """ return list of all the flights of airline company, is there is any. """
-
         try:
             flights = DAL.get_flights_by_airline_id(airline_id=airline_id)
             return flights

@@ -1,11 +1,13 @@
-from facads.facade_base import FacadeBase
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
+
 from rest_framework import status
+from facads.facade_base import FacadeBase
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+
 from base.serializers import FlightModelSerializer, AirlineCompanyModelSerializer, CountryModelSerializer, UserModelSerializer
 
 
@@ -18,7 +20,6 @@ def get_user_data(request):
 
         # Merge between serializer.data and role_data objs
         merged_obj = {}
-
         merged_obj.update(role_data)
         merged_obj.update(serializer.data)
 
@@ -31,8 +32,6 @@ def get_user_data(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_all_flights(request):
-    """ getting list of all the flights, serialize it and return it's data. """
-
     try:
         flights = FacadeBase.get_all_flights()
         serializer = FlightModelSerializer(flights, many=True)
@@ -41,11 +40,9 @@ def get_all_flights(request):
         return Response({'message': str(e)}, status=status.HTTP_100_CONTINUE)
 
 
-@permission_classes([IsAuthenticated])
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_flight_by_id(request):
-    """ getting the flight, serialize it and return it's data. """
-
     try:
         flight = FacadeBase.get_flight_by_id(
             flight_id=request.query_params['flight_id'])
@@ -55,10 +52,9 @@ def get_flight_by_id(request):
         return Response({'message:': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes([AllowAny])
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_flights_by_parameters(request):
-    """ getting list of all the flights, serialize it and return it's data. """
     try:
         if request.method == 'GET':
             origin_country = request.query_params['origin_country']
@@ -75,11 +71,9 @@ def get_flights_by_parameters(request):
         return Response({'message': str(e)}, status=status.HTTP_200_OK)
 
 
-@permission_classes([IsAuthenticated])
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_all_airlines(request):
-    """ getting list of all the airlines, serialize it and return it's data. """
-
     try:
         airlines = FacadeBase.get_all_airlines()
         serializer = AirlineCompanyModelSerializer(
@@ -89,11 +83,9 @@ def get_all_airlines(request):
         return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
 
-@permission_classes([IsAuthenticated])
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_airline_by_id(request):
-    """ getting the airline, serialize it and return it's data. """
-
     try:
         airline = FacadeBase.get_airline_by_id(
             airline_id=request.data['airline_id'])
@@ -103,11 +95,9 @@ def get_airline_by_id(request):
         return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes([IsAuthenticated])
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_airlines_by_parameters(request):
-    """ getting list of all the airlines, serialize it and return it's data. """
-
     try:
         name = request.GET.get("name")
         country_id = request.GET.get("country_id")
@@ -120,11 +110,9 @@ def get_airlines_by_parameters(request):
         return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
 
-@permission_classes([IsAuthenticated])
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_all_countries(request):
-    """ getting list of all the countries, serialize it and return it's data. """
-
     try:
         countries = FacadeBase.get_all_countries()
         serializer = CountryModelSerializer(
@@ -134,11 +122,9 @@ def get_all_countries(request):
         return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
 
-@permission_classes([IsAuthenticated])
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_country_by_id(request):
-    """ getting the country, serialize it and return it's data. """
-
     try:
         country = FacadeBase.get_country_by_id(
             country_id=request.data['country_id'])

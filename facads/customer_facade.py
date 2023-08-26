@@ -14,7 +14,7 @@ class CustomerFacade(FacadeBase):
         """ return updated user if the data passes validations. """
         customer = DAL.get_by_id(Customer, kwargs['customer_id'])
 
-        try:  # data validations
+        try:  # consider possibility that not every fields are to update
             if customer.user.username != kwargs['username'] and FacadsValidator.is_username_not_exists(username=kwargs['username']) or customer.user.username == kwargs['username']:
                 if customer.user.email != kwargs['email'] and FacadsValidator.is_email_not_exists(kwargs['email']) or customer.user.email == kwargs['email']:
                     if customer.phone_no != kwargs['phone_no'] and FacadsValidator.is_phone_not_exists(phone=kwargs['phone_no']) or customer.phone_no == kwargs['phone_no']:
@@ -59,9 +59,8 @@ class CustomerFacade(FacadeBase):
             raise Exception(f'{str(e)}')
 
     def add_ticket(customer_id, flight_id):
-        """ create and return new ticket if data passes validations. """
-
-        try:  # check for available tickets + if flight took off
+        # check if there are available tickets + if flight took off
+        try:
             flight = DAL.get_by_id(Flight, flight_id)
             if flight.departure_time < datetime.now(pytz.UTC):
                 raise Exception('Flight departed')
@@ -90,7 +89,6 @@ class CustomerFacade(FacadeBase):
 
     def remove_ticket(ticket_id):
         """ delete and return ticket if it's on time. """
-
         try:
             ticket = DAL.get_by_id(Ticket, ticket_id)
             if ticket.flight.departure_time < datetime.now(pytz.UTC):
@@ -108,8 +106,6 @@ class CustomerFacade(FacadeBase):
             raise Exception(f'{str(e)}')
 
     def get_my_tickets(customer_id):
-        """ return list of all customer's tickets, if there are any. """
-
         try:
             tickets = DAL.get_tickets_by_customer_id(customer_id)
             return tickets

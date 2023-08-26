@@ -1,8 +1,11 @@
 from django.db import models
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from datetime import datetime, timedelta
+
+# user management
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
+
 from django.db.models import Q
+from datetime import datetime, timedelta
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 
 # this file contain the flight management system's models. some of the models have method/s in here.
@@ -33,7 +36,7 @@ class Flight(models.Model):
 
     @staticmethod
     def get_flights_by_parameters(origin_country_id=None, destination_country_id=None, date=None):
-        """ return list of all the flights or reduce it according to conditions, if there is any. """
+        """ return list of all the flights or reduce it according to conditions, if there are any. """
 
         # inserting all the existing conditions to a q.
         filter_conditions = Q()
@@ -68,8 +71,6 @@ class Flight(models.Model):
 
     @staticmethod
     def get_flights_by_airline_id(airline_id):
-        """ return all flights of specific airline according to it's id. """
-
         try:  # get and return the flights.
             flights = Flight.objects.filter(airline_company_id=airline_id)
             if not flights.exists():  # if there are no flights.
@@ -82,8 +83,7 @@ class Flight(models.Model):
 
     @staticmethod
     def get_arrival_flights(country_id):
-        """ return list of all flights that are arriving in the next 12 hours to specific country. """
-
+        """ return list of all flights that are arriving up to the next 12 hours to specific country. """
         try:  # get and return the flights.
             flights = Flight.objects.filter(destination_country_id=country_id, landing_time__gte=datetime.now(
             ), landing_time__lte=datetime.now()+timedelta(hours=12))
@@ -96,7 +96,7 @@ class Flight(models.Model):
 
     @staticmethod
     def get_departure_flights(country_id):
-        """ return list of all the flights that are departure in the next 12 hours from specific country. """
+        """ return list of all the flights that are departure up to the next 12 hours from specific country. """
 
         try:
             flights = Flight.objects.filter(origin_country_id=country_id, departure_time__gte=datetime.now(
@@ -185,8 +185,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @staticmethod
     def get_user_by_username(username):
-        """ return user according to it's username. """
-
         try:
             user = User.objects.filter(username=username)
             if not user.exists():
@@ -199,8 +197,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @staticmethod
     def get_user_by_email(email):
-        """ return user according to it's email. """
-
         try:
             user = User.objects.filter(email=email)
             if not user.exists():
@@ -232,8 +228,6 @@ class Customer(models.Model):
 
     @staticmethod
     def get_customer_by_username(username):
-        """ return customer according to it's user's username. """
-
         try:
             customer = Customer.objects.select_related(
                 'user').get(user__username=username)
@@ -264,7 +258,6 @@ class AirlineCompany(models.Model):
 
     @staticmethod
     def get_airline_by_name(name):
-        """ return airline according to it's name. """
         try:
             airline = AirlineCompany.objects.filter(name=name)
             if not airline.exists():
@@ -276,7 +269,7 @@ class AirlineCompany(models.Model):
 
     @staticmethod
     def get_airlines_by_parameters(name=None, country_id=None):
-        """ return list of all the airlines or reduce it according to conditions, if there is any. """
+        """ return list of all the airlines or reduce it according to conditions, if there are any. """
 
         # inserting all the existing conditions to a q
         filter_conditions = Q()

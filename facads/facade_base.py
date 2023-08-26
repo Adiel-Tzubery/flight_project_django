@@ -7,7 +7,6 @@ class FacadeBase:
 
     @staticmethod
     def get_user_data(user_id):
-        """ return all user data according to it's id """
         try:
             user_obj = DAL.get_by_id(User, user_id)
             role_data = DAL.get_role_data_by_user(user_obj)
@@ -18,8 +17,6 @@ class FacadeBase:
 
     @staticmethod
     def get_all_flights():
-        """ return list of all the flights, if there are any. """
-
         try:
             flights = DAL.get_all(Flight)
             return flights
@@ -28,8 +25,6 @@ class FacadeBase:
 
     @staticmethod
     def get_flight_by_id(flight_id):
-        """ return a specific flight according to it's id.  """
-
         try:
             flight = DAL.get_by_id(Flight, flight_id)
             return flight
@@ -39,8 +34,6 @@ class FacadeBase:
 
     @staticmethod
     def get_flights_by_parameters(origin_country, destination_country, date):
-        """ return list of all the flights or reduce it according to conditions, if there is any. """
-
         try:
             flights = DAL.get_flights_by_parameters(
                 origin_country, destination_country, date)
@@ -51,8 +44,6 @@ class FacadeBase:
 
     @staticmethod
     def get_all_airlines():
-        """ return list of all the airlines, if there are any. """
-
         try:
             airlines = DAL.get_all(AirlineCompany)
             return airlines
@@ -61,8 +52,6 @@ class FacadeBase:
 
     @staticmethod
     def get_airline_by_id(airline_id):
-        """ return a specific airline according to it's id.  """
-
         try:
             airline = DAL.get_by_id(AirlineCompany, airline_id)
             return airline
@@ -72,8 +61,7 @@ class FacadeBase:
 
     @staticmethod
     def get_airline_by_parameters(name, country_id):
-        """ return list of all the airlines or reduce it according to conditions, if there is any. """
-
+        """ return list of all the airlines or reduce it according to conditions, if there are any. """
         try:
             airline = DAL.get_airlines_by_parameters(name, country_id)
             return airline
@@ -83,8 +71,6 @@ class FacadeBase:
 
     @staticmethod
     def get_all_countries():
-        """ return list of all the airlines, if there are any. """
-
         try:
             counties = DAL.get_all(Country)
             return counties
@@ -93,8 +79,6 @@ class FacadeBase:
 
     @staticmethod
     def get_country_by_id(country_id):
-        """ return a specific country according to it's id.  """
-
         try:
             country = DAL.get_by_id(Country, country_id)
             return country

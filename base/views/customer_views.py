@@ -3,11 +3,11 @@ from base.serializers import CustomerModelSerializer, TicketModelSerializer
 
 from django.core.exceptions import ObjectDoesNotExist
 
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
-from rest_framework import status
 
 from auth.auth import group_required
 
@@ -16,7 +16,6 @@ from auth.auth import group_required
 @api_view(['PUT'])
 @group_required('customer')
 def update_customer(request):
-    """ getting the updated customer, serialize the new user and return the data. """
     try:
         updated_customer = CustomerFacade.update_customer(
             customer_id=request.data['customer_id'],
@@ -40,7 +39,7 @@ def update_customer(request):
 @api_view(['POST'])
 @group_required('customer')
 def add_ticket(request):
-    """ getting new ticket from the facade, serialize it and return the data """
+    """ customer bout a ticked """
 
     try:
         ticket = CustomerFacade.add_ticket(
@@ -69,10 +68,7 @@ def remove_ticket(request):
 @api_view(['GET'])
 @group_required('customer')
 def get_my_tickets(request):
-    """ getting list of customer's tickets, serialize it and return the data. """
     try:
-        # customer_id = Customer.objects.filter(
-        #     user=request.user.id).first().user
         tickets = CustomerFacade.get_my_tickets(
             customer_id=request.query_params['customer_id'])
         serializer = TicketModelSerializer(tickets, many=True)

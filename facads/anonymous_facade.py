@@ -7,8 +7,6 @@ from base.models import User, Customer
 class AnonymousFacade(FacadeBase, FacadsValidator):
 
     def create_new_user(**kwargs):
-        """ create and return new user if data passes validations. """
-
         try:
             if AnonymousFacade.is_username_not_exists(kwargs['username']):
                 if AnonymousFacade.is_email_not_exists(kwargs['email']):
@@ -24,8 +22,6 @@ class AnonymousFacade(FacadeBase, FacadsValidator):
             raise Exception(f'Error: {str(e)}.')
 
     def add_customer(**kwargs):
-        """ create and return new customer if data passes validations. """
-
         try:
             if AnonymousFacade.is_phone_not_exists(kwargs['phone_no']):
                 if AnonymousFacade.is_credit_not_exists(kwargs['credit_card_no']):
