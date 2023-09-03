@@ -2,14 +2,14 @@
 
 # admin user: username - adiel password - admin1234
 
-# לכל אורך הפרויקט השתדלתי לאזן בין דרישות הפרויקט לבין חלוקת קוד נכונה. אם יש איזה קונפליקט בין השניים אני אציין אותו במפורש.
+#  לכל אורך הפרויקט השתדלתי לאזן בין דרישות הפרויקט לבין חלוקת קוד נכונה. אם יש איזה קונפליקט בין השניים אני אציין אותו במפורש פה בקובץ, ובנוסף מה עשיתי בפועל.
 
 
 
 נקודות כלליות:
 * למידע כללי על המערכת + כללים כללים להתנהלות בהת יש להיכנס ל- About ATravel שנמצא בנבבר.
- * .אין הפרדה בין יצירת יוזר, ליצירת משתמש מבחינת הלקוח קצה
- * .כשעושים רג'יסטר רגיל זה אוטומטית יוצר לקוח
+ * אין הפרדה בין יצירת יוזר, ליצירת משתמש מבחינת הלקוח קצה.
+ * כשעושים רג'יסטר רגיל זה אוטומטית יוצר לקוח.
 * רק לאדמין יש אפשרות ליצור משתמש אדמין אחר או חברת תעופה.
 * לאדמין יש גם האפשרות ליצור משתמש לקוח רגיל.
 
@@ -18,7 +18,7 @@ models:
 * even though you have told us that the model can be treated as part of the DAL layer, i treated the model's functions
 as the model's and not as the DAL's, and in the DAL i just reference to theme. (even though it may seem as redundant code, i felt the need to write my code to answer the instructions as much as i can)
 
-* in didn't happened allot, but when i needed, i added functions to the models. 
+* iT didn't happened a lot, but when i needed, i added functions to the models. 
 
 ~~~~~~~~~~~~~~
 DAL:
