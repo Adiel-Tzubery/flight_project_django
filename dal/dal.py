@@ -1,21 +1,32 @@
+import logging
+import logging.config
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from base.models import Administrator, AirlineCompany, Flight, Customer, Ticket, User, Country
 from datetime import datetime, time
 
 from django.contrib.auth.hashers import check_password
 
+logging.config.dictConfig(settings.LOGGING)
+
 
 class DAL:
     """ class DAL for direct communication with the data base. """
 
-    #                                      @@@@@@@@@@@@@_____first 6 method are global to all the models _____@@@@@@@@@@@@@
+    info_logger = logging.getLogger('dal.info')
+    error_logger = logging.getLogger('dal.error')
+
+    # @@@@@@@@@@@@@_____first 6 method are global to all the models _____@@@@@@@@@@@@@
 
     @staticmethod
     def get_by_id(model, id):
         try:
             instance = model.objects.get(pk=id)
+            DAL.info_logger.info(f'Reading "{model.__name__}" object')
             return instance
         except model.DoesNotExist:  # if the instance does not exist.
+            # self.error_logger.error(
+            #     f'Failed reading "{model.__name__}" object (404 not found)')
             raise ObjectDoesNotExist(f'No {model.__name__} found with id {id}')
         except Exception as e:  # any other error.
             raise Exception(
@@ -30,6 +41,7 @@ class DAL:
             if not instances.exists():  # if there isn't even one instance of the model.
                 raise ObjectDoesNotExist(
                     f'No instances found for model: {model.__name__}.')
+            DAL.info_logger.info(f'Reading all "{model.__name__}" object')
             return instances
         except ObjectDoesNotExist:
             raise ObjectDoesNotExist(

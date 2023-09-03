@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 from datetime import timedelta
 
@@ -27,7 +28,7 @@ SECRET_KEY = 'django-insecure-a=ji5u+(uev7co+ow0m#jh19s(@_9+em)xxgl-m&x^^f_g$6f^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -90,14 +91,25 @@ WSGI_APPLICATION = 'flight_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'flight_system_db',
-        'USER': 'postgres',
-        'PASSWORD': 'admin1234',
-        'HOST': 'localhost',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'grneapoy',
+        'USER': 'grneapoy',
+        'PASSWORD': 'QrFTRsM9fcolfpfzoIdZjDKSF-wxFi_r',
+        'HOST': 'hansken.db.elephantsql.com',
         'PORT': '5432',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'flight_system_db',
+#         'USER': 'postgres',
+#         'PASSWORD': 'admin1234',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
@@ -179,8 +191,73 @@ SIMPLE_JWT = {
 
 
 # CORS_ALLOWED_ORIGINS = ["*"]
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
+
+# CSRF_TRUSTED_ORIGINS = [
+#     'http://127.0.0.1:5173',
+#     'http://localhost:5173',
+#     'https://atravel.azurewebsites.net/',
+# ]
+
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'https://atravel.azurewebsites.net',
+    'https://purple-river-081e5450f.3.azurestaticapps.net',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'https://atravel.azurewebsites.net',
+    'https://purple-river-081e5450f.3.azurestaticapps.net',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 
 # CORS_ORIGIN_WHITELIST = (
 #     'http://localhost:3000',
 # )
+
+
+# LOGGING
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'info_file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logging/info.log'),
+            'maxBytes': 1024 * 1024 * 10,  # 10 MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+        'error_file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logging/error.log'),
+            'maxBytes': 1024 * 1024 * 10,  # 10 MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'dal.info': {
+            'handlers': ['info_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'dal.error': {
+            'handlers': ['error_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} - {asctime} - {message}',
+            'style': '{',
+        }
+    },
+}
